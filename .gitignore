@@ -1,0 +1,4 @@
+/node_modules/
+botconfig.json
+package-lock.json
+package.json

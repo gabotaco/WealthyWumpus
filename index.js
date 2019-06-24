@@ -2,8 +2,52 @@ const Discord = require("discord.js");
 const botconfig = require("./botconfig.json");
 const bot = new Discord.Client({ disableEveryone: true });
 const fs = require("fs")
-
 bot.games = new Discord.Collection();
+
+class Card {
+    constructor (Text, Money, Jail, MoveTo, CollectFromPlayers) {
+        this.Text = Text;
+        this.Money = Money;
+        this.GetOutOfJail = Jail;
+        this.MoveTo = MoveTo
+        this.CollectFromPlayers = CollectFromPlayers
+    }
+}
+const CommunityChestCards = [
+    new Card("Advance to \"Go\"", 200, false, 0),
+    new Card("Bank error in your favor. Collect $200", 200, false, null),
+    new Card("Doctor's fees", -50, false, null),
+    new Card("From sale of stock you get $50", 50, false, null),
+    new Card("Get Out of Jail Free", 0, true, null),
+    new Card("Go to Jail. Go directly to jail. Do not pass Go, Do not collect $200", 0, false, 10),
+    new Card("Grand Opera Night. Collect $50 from every player for opening night seats.", 50, false, null, true),
+    new Card("Holiday Fund matures. Receive $100.", 100, false, null, false),
+    new Card("Income tax refund. Collect $20", 20, false, null, false),
+    new Card("It is your birthday. Collect $10 from every player.", 10, false, null, true),
+    new Card("Life insurance matures - Collect $100", 100, false, null, false),
+    new Card("Hospital Fees. Pay $50.", -50, false, null, false),
+    new Card("School fees. Pay $50.", -50, false, null, false),
+    new Card("Receive $25 consultancy fee.", 25, false, null, false),
+    new Card("You have won second prize in a beauty contest. Collect $10.", 10, false, null, false),
+    new Card("You inherit $100.", 100, false, null, false)
+]
+
+const ChanceCards = [
+    new Card("Advance to \"Go\"", 200, false, 0, false),
+    new Card("Advance to Illinois Ave. If you pass Go, collect $200", 0, false, 24, false),
+    new Card("Advance to St. Charles Place. If you pass Go, collect $200", 0, false, 16, false),
+    new Card("Bank pays you dividend of $50.", 50, false, null, false),
+    new Card("Get out of Jail Free", 0, true, null, false),
+    new Card("Go to Jail. Go directly to Jail", 0, false, 10, false),
+    new Card("Pay poor tax of $15", -15, false, null, false),
+    new Card("Take a trip to Reading Railroad", 0, false, 5, false),
+    new Card("Take a walk on Board walk", 0, false, 39, false),
+    new Card("You have been elected Chairman of the Board. Pay each player $50", -50, false, null, true),
+    new Card("Your building loan matures. Receive $150.", 150, false, null, false),
+    new Card("You have won a crossword competition. Collect $100", 100, false, null, false)
+]
+
+
 
 class Property {
     constructor(Name, Rent, Color, Price, Mortgage, Building) {
@@ -15,6 +59,7 @@ class Property {
         this.Building = Building;
         this.Mortgaged = false;
         this.Owner = null;
+        this.Houses = 0;
     }
 }
 
@@ -34,6 +79,7 @@ class Player {
         this.Yellow = 0;
         this.Green = 0;
         this.DarkBlue = 0;
+        this.GetOutOfJail = 0;
     }
 }
 class Game {
@@ -127,14 +173,12 @@ class Game {
         if (message.author.id != this.CurrentPlayer.ID) return message.reply("it's not your turn!")
         const Dice1 = Math.floor(Math.random() * 6) + 1;
         const Dice2 = Math.floor(Math.random() * 6) + 1;
-        let Message = `You rolled a ${Dice1} and a ${Dice2}`
+        message.reply(`you rolled a ${Dice1} and a ${Dice2}`)
         this.CurrentPlayer.Position += Dice1 + Dice2;
         if (this.CurrentPlayer.Position >= this.Properties.length) {
-            Message += " and you passed GO and collected $200."
             this.CurrentPlayer.Money += 200;
             this.CurrentPlayer.Position -= this.Properties.length;
         }
-        message.channel.send(Message)
 
         const CurrentProperty = this.Properties[this.CurrentPlayer.Position]
         const PropertyEmbed = new Discord.RichEmbed()
@@ -164,30 +208,75 @@ class Game {
         }
 
         if (CurrentProperty.Color == "GO") {
-
-        } else if (CurrentProperty.Color == "Chest") {
-
+            message.reply("You landed on go and collected $200. You now have $" + this.CurrentPlayer.Money)
+        } else if (CurrentProperty.Color == "Chest" || CurrentProperty.Color == "Chance") {
+            if (CurrentProperty.Color == "Chest") {
+                var card = CommunityChestCards[Math.floor(Math.random() * CommunityChestCards.length)]
+            } else if (CurrentProperty.Color == "Chance") {
+                var card = ChanceCards[Math.floor(Math.random() * ChanceCards.length)]
+            } 
+            let Message = `you landed on a ${CurrentProperty.Color.toLowerCase()} card and it says "${card.Text}".`
+            if (card.MoveTo == 10) {
+                this.CurrentPlayer.Position = 10
+                this.CurrentPlayer.Jailed = true;
+            } else if (card.GetOutOfJail) {
+                this.CurrentPlayer.GetOutOfJail++;
+            } else if (card.MoveTo) {
+                if (card.MoveTo < this.CurrentPlayer.Position) {
+                    Message += ` You passed go and collected $200! You now have $${this.CurrentPlayer.Money}`
+                    this.CurrentPlayer.Money += 200;
+                    this.CurrentPlayer.Position = card.MoveTo
+                } else {
+                    this.CurrentPlayer.Position = card.MoveTo
+                }
+            } else if (card.CollectFromPlayers) {
+                this.CurrentPlayer.Money += this.Players.size * card.Money
+                this.Players.array().forEach(player => {
+                    if (player.ID != this.CurrentPlayer.ID) {
+                        player.Money += card.Money
+                    }
+                });
+                Message += ` You collected $${this.Players.size * card.Money} and now have $${this.CurrentPlayer.Money}`
+            } else {
+                this.CurrentPlayer.Money += card.Money;
+                Message += ` You now have $${this.CurrentPlayer.Money}`
+            }
+            message.reply(Message)
         } else if (CurrentProperty.Color == "Tax") {
-
-        } else if (CurrentProperty.Color == "RR") {
-
-        } else if (CurrentProperty.Color == "Chance") {
-
+            this.CurrentPlayer.Money -= CurrentProperty.Rent
+            message.reply(`you landed on ${CurrentProperty.Name} and payed $${CurrentProperty.Rent}. You now have $${this.CurrentPlayer.Money}`)
         } else if (CurrentProperty.Color == "Jail") {
-
+            message.reply("you are just visiting jail.")
         } else if (CurrentProperty.Color == "Utility") {
-
+            if (CurrentProperty.Owner) {
+                if (CurrentProperty.Owner.ID != this.CurrentPlayer.ID) {
+                    this.CurrentPlayer.Money -= CurrentProperty.Rent[CurrentProperty.Owner.Utility]
+                    message.reply(`You landed on <@${CurrentProperty.Owner.ID}>'s ${CurrentProperty.Name} and paid him $${CurrentProperty.Rent[CurrentProperty.Owner.Utility]}. You now have ${this.CurrentPlayer.Money}`)    
+                } else {
+                    message.reply(`You landed on you own ${CurrentProperty.Name}.`)
+                }
+            } else {
+                message.reply(`You landed on ${CurrentProperty.Name} and it costs $${CurrentProperty.Price}`)
+            }
         } else if (CurrentProperty.Color == "Parking") {
-
+            message.reply("You landed on free parking.")
         } else if (CurrentProperty.Color == "Go To Jail") {
-
+            message.reply("You landed on go to jail!")
+            this.CurrentPlayer.Position = 10;
+            this.CurrentPlayer.Jailed = true;
         } else {
             if (CurrentProperty.Owner) {
                 if (CurrentProperty.Owner.ID == this.CurrentPlayer.ID) message.reply(`You landed on ${this.Properties[this.CurrentPlayer.Position].Name} but you already own it.`)
-                else message.reply(`You landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>`)
-
+                else {
+                    message.reply(`You landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>`)
+                    
+                }
             } else {
-                message.channel.send(PropertyEmbed)
+                if (CurrentProperty.Color == "RR") {
+                    message.reply(`You landed on ${CurrentProperty.Name} and it costs $${CurrentProperty.Price}.`)
+                } else {
+                    message.channel.send(PropertyEmbed)
+                }
             }
         }
         /*if (Dice1 == Dice2) message.reply("you rolled doubles so you get to go again!")
@@ -197,6 +286,29 @@ class Game {
             this.CurrentPlayer = this.Players.array()[this.CurrentPlayerIndex]
             message.channel.send(`<@${this.CurrentPlayer.ID}> it's your turn!`)
         }*/
+    }
+
+    Stats(message) {
+        if (!this.Players.has(message.author.id)) return message.reply("you aren't in this game")
+        const player = this.Players.get(message.author.id)
+        const PlayerEmbed = new Discord.RichEmbed()
+        PlayerEmbed.setTitle(`Stats for ${message.member.displayName}`)
+        PlayerEmbed.setColor("DEFAULT")
+        PlayerEmbed.addField("Position", this.Properties[player.Position].Name, true)
+        PlayerEmbed.addField("Money", player.Money, true)
+        PlayerEmbed.addField("Get out of jail cards", player.GetOutOfJail, true)
+        PlayerEmbed.addField("Currently Jailed?", player.Jailed, true)
+        .addField("Rail roads", player.RR, true)
+        .addField("Utilities", player.Utility, true)
+        .addField("Brown Properties", player.Brown, true)
+        .addField("Light blue properties", player.LightBlue, true)
+        .addField("Pink properties", player.Pink, true)
+        .addField("Orange Properties", player.Orange, true)
+        .addField("Red properties", player.Red, true)
+        .addField("Yellow properties", player.Yellow, true)
+        .addField("Green properties", player.Green, true)
+        .addField("Dark blue properties", player.DarkBlue, true)
+        message.channel.send(PlayerEmbed)
     }
 }
 
@@ -236,7 +348,7 @@ bot.on("message", async (message) => {
                     message.reply("theres already a game in this channel!")
                 }
                 break;
-            case "end":
+            case "stop":
                 if (bot.games.has(message.channel.id)) {
                     if (bot.games.get(message.channel.id).Leader == message.author.id) {
                         bot.games.delete(message.channel.id)
@@ -283,6 +395,18 @@ bot.on("message", async (message) => {
                     bot.games.get(message.channel.id).Roll(message)
                 }
                 break;
+            case "stats":
+                if (!bot.games.has(message.channel.id)) {
+                    message.reply(`there is no game in this channel. Do ${prefix}create to make a game`)
+                } else {
+                    bot.games.get(message.channel.id).Stats(message)
+                }
+            case "buy":
+                    if (!bot.games.has(message.channel.id)) {
+                        message.reply(`there is no game in this channel. Do ${prefix}create to make a game`)
+                    } else {
+                        bot.games.get(message.channel.id).Stats(message)
+                    }
         }
     }
 })

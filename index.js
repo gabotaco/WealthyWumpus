@@ -723,6 +723,10 @@ class Game {
         this.Properties[PropertyIndex].Houses++;
         message.reply(`you spent $${this.Properties[PropertyIndex].Building} and now have ${this.Properties[PropertyIndex].Houses} ${(this.Properties[PropertyIndex].Houses == 1)?"house":"houses"} on it!`)
     }
+
+    Sell(message) {
+
+    }
 }
 
 bot.login(botconfig.token)
@@ -843,6 +847,13 @@ bot.on("message", async (message) => {
                     message.reply(`there is no game in this channel. Do ${prefix}create to make a game`)
                 } else {
                     bot.games.get(message.channel.id).BuyProperty(message)
+                }
+                break;
+            case "sell":
+                if (!bot.games.has(message.channel.id)) {
+                    message.reply(`there is no game in this channel. Do ${prefix}create to make a game`)
+                } else {
+                    bot.games.get(message.channel.id).Sell(message)
                 }
                 break;
         }

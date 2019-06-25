@@ -162,7 +162,10 @@ class Player {
 
     RemoveMoney(message, num) {
         this.Money -= parseInt(num)
-        if (this.Money < 0) message.channel.send(`<@${this.ID}> you are in debt!`)
+        if (this.Money < 0) {
+            message.channel.send(`<@${this.ID}> you are in debt!`)
+
+        }
     }
 
     AddMoney(message, num) {
@@ -785,7 +788,7 @@ class Game {
         let FoundHouseIndex;
         for (let i = 0; i < this.Properties.length; i++) {
             const CurrentProperty = this.Properties[i]
-            if (CurrentProperty.Name.toLowerCase().includes(Arg.toLowerCase())) {
+            if (CurrentProperty.Name.toLowerCase().includes(Arg.toLowerCase()) && CurrentProperty.Owner.ID == this.CurrentPlayer.ID) {
                 if (FoundHouseIndex) {
                     return message.reply("you have to be more specific with the property name")
                 } else {
@@ -881,7 +884,7 @@ class Game {
         const Player = this.Players.get(message.author.id);
         if (!Player.CurrentOffer) return message.reply("you don't have a pending offer")
         const Property = this.Properties[Player.CurrentOffer.PropertyIndex]
-        if (Player.CurrentOffer.OriginalOwner != Property.Owner.ID) {
+        if (Player.CurrentOffer.OriginalOwner.ID != Property.Owner.ID) {
             Player.CurrentOffer = null;
             return message.reply("someone already bought it!")
         }
@@ -892,6 +895,7 @@ class Game {
             if (amount == Player.CurrentOffer.Price) {
                 Property.Buy(Player)
                 Player.RemoveMoney(message, Player.CurrentOffer.Price)
+                this.Players.get(Player.CurrentOffer.OriginalOwner.ID).AddMoney(message, Player.CurrentOffer.Price)
                 Player.CurrentOffer = null;
                 return message.reply(`you bought ${Property.Name} for $${Player.CurrentOffer.Price}`);
             } else {
@@ -903,6 +907,102 @@ class Game {
         } else {
             return message.reply(`.offer [confirm|deny] {amount}`)
         }
+    }
+
+    Mortgage(message) {
+        if (!this.InProgress) return message.reply("the game hasen't started yet!")
+        if (message.author.id != this.CurrentPlayer.ID) return message.reply('its not your turn')
+
+        let Arg = message.content.split(" ")[1]
+        if (!Arg) return message.reply("You must specify what property you want to mortgage!")
+
+        let FoundHouseIndex;
+        for (let i = 0; i < this.Properties.length; i++) {
+            const CurrentProperty = this.Properties[i]
+            if (CurrentProperty.Name.toLowerCase().includes(Arg.toLowerCase()) && CurrentProperty.Owner.ID == this.CurrentPlayer.ID) {
+                if (FoundHouseIndex) {
+                    return message.reply("you have to be more specific with the property name")
+                } else {
+                    FoundHouseIndex = i
+                }
+            }
+        }
+        if (!FoundHouseIndex) return message.reply("couldn't find that property")
+        const FoundHouse = this.Properties[FoundHouseIndex]
+
+        switch (FoundHouse.Color) {
+            case "DARK_ORANGE":
+                if (this.Properties[1].Houses > 0) {
+                    return message.reply(`you have to sell all the houses on ${this.Properties[1].Name} first!`)
+                } else if (this.Properties[3].Houses > 0) {
+                    return message.reply(`you have to sell all the houses on ${this.Properties[3].Name} first!`)
+                }
+                break;
+            case "BLUE":
+                if (this.Properties[6].Houses > 0) {
+                    return message.reply(`you have to sell all the houses on ${this.Properties[6].Name} first!`)
+                } else if (this.Properties[8].Houses > 0) {
+                    return message.reply(`you have to sell all the houses on ${this.Properties[8].Name} first!`)
+                } else if (this.Properties[9].Houses > 0) {
+                    return message.reply(`you have to sell all the houses on ${this.Properties[9].Name} first!`)
+                }
+                break;
+            case "LUMINOUS_VIVID_PINK":
+                if (this.Properties[11].Houses > 0) {
+                    return message.reply(`you have to sell all the houses on ${this.Properties[11].Name} first!`)
+                } else if (this.Properties[13].Houses > 0) {
+                    return message.reply(`you have to sell all the houses on ${this.Properties[13].Name} first!`)
+                } else if (this.Properties[14].Houses > 0) {
+                    return message.reply(`you have to sell all the houses on ${this.Properties[14].Name} first!`)
+                }
+                break;
+            case "ORANGE":
+                if (this.Properties[16].Houses > 0) {
+                    return message.reply(`you have to sell all the houses on ${this.Properties[16].Name} first!`)
+                } else if (this.Properties[18].Houses > 0) {
+                    return message.reply(`you have to sell all the houses on ${this.Properties[18].Name} first!`)
+                } else if (this.Properties[19].Houses > 0) {
+                    return message.reply(`you have to sell all the houses on ${this.Properties[19].Name} first!`)
+                }
+                break;
+            case "DARK_RED":
+                if (this.Properties[21].Houses > 0) {
+                    return message.reply(`you have to sell all the houses on ${this.Properties[21].Name} first!`)
+                } else if (this.Properties[23].Houses > 0) {
+                    return message.reply(`you have to sell all the houses on ${this.Properties[23].Name} first!`)
+                } else if (this.Properties[24].Houses > 0) {
+                    return message.reply(`you have to sell all the houses on ${this.Properties[24].Name} first!`)
+                }
+                break;
+            case "GOLD":
+                if (this.Properties[26].Houses > 0) {
+                    return message.reply(`you have to sell all the houses on ${this.Properties[26].Name} first!`)
+                } else if (this.Properties[27].Houses > 0) {
+                    return message.reply(`you have to sell all the houses on ${this.Properties[27].Name} first!`)
+                } else if (this.Properties[29].Houses > 0) {
+                    return message.reply(`you have to sell all the houses on ${this.Properties[29].Name} first!`)
+                }
+                break;
+            case "DARK_GREEN":
+                if (this.Properties[31].Houses > 0) {
+                    return message.reply(`you have to sell all the houses on ${this.Properties[31].Name} first!`)
+                } else if (this.Properties[32].Houses > 0) {
+                    return message.reply(`you have to sell all the houses on ${this.Properties[32].Name} first!`)
+                } else if (this.Properties[34].Houses > 0) {
+                    return message.reply(`you have to sell all the houses on ${this.Properties[34].Name} first!`)
+                }
+                break;
+            case "DARK_BLUE":
+                if (this.Properties[37].Houses > 0) {
+                    return message.reply(`you have to sell all the houses on ${this.Properties[37].Name} first!`)
+                } else if (this.Properties[39].Houses > 0) {
+                    return message.reply(`you have to sell all the houses on ${this.Properties[39].Name} first!`)
+                }
+                break;
+        }
+
+        FoundHouse.Mortgaged = true;
+        FoundHouse.Owner.AddMoney(message, FoundHouse.Mortgage)
     }
 }
 
@@ -1038,6 +1138,13 @@ bot.on("message", async (message) => {
                     message.reply(`there is no game in this channel. Do ${prefix}create to make a game`)
                 } else {
                     bot.games.get(message.channel.id).Offer(message)
+                }
+                break;
+            case "mortgage":
+                if (!bot.games.has(message.channel.id)) {
+                    message.reply(`there is no game in this channel. Do ${prefix}create to make a game`)
+                } else {
+                    bot.games.get(message.channel.id).Mortgage(message)
                 }
                 break;
         }

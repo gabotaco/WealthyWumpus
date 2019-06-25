@@ -325,7 +325,7 @@ class Game {
         this.InProgress = true;
         this.CurrentPlayerIndex = Math.floor(Math.random() * this.Players.size)
         this.CurrentPlayer = this.Players.array()[this.CurrentPlayerIndex]
-
+        
         message.channel.send(`Lets get the show on the road! <@${this.CurrentPlayer.ID}>, you are going first! Do ${botconfig.prefixes[message.guild.id].prefix}roll to roll!`)
     }
 
@@ -458,6 +458,7 @@ class Game {
                 }
             } else {
                 message.reply(`You landed on ${CurrentProperty.Name} and it costs $${CurrentProperty.Price}. Do ${botconfig.prefixes[message.guild.id].prefix}buy to buy it or do ${botconfig.prefixes[message.guild.id].prefix}end to auction it!`)
+                message.channel.send(CurrentProperty.Info())
             }
         } else if (CurrentProperty.Color == "Parking") {
             message.reply("You landed on free parking.")
@@ -482,6 +483,7 @@ class Game {
                 }
             } else {
                 message.reply(`You landed on ${CurrentProperty.Name} and it costs $${CurrentProperty.Price}. Do ${botconfig.prefixes[message.guild.id].prefix}buy to buy it!`)
+                message.channel.send(CurrentProperty.Info())
             }
         } else {
             if (CurrentProperty.Owner) {
@@ -825,7 +827,7 @@ class Game {
         if (!PropertyIndex) return message.reply("you can't buy a house on anything!")
         this.CurrentPlayer.RemoveMoney(message, this.Properties[PropertyIndex].Building, null)
         this.Properties[PropertyIndex].Houses++;
-        message.reply(`you spent $${this.Properties[PropertyIndex].Building} and now have ${this.Properties[PropertyIndex].Houses} ${(this.Properties[PropertyIndex].Houses == 1)?"house":"houses"} on it!`)
+        message.reply(`you spent $${this.Properties[PropertyIndex].Building} and now have ${this.Properties[PropertyIndex].Houses} ${(this.Properties[PropertyIndex].Houses == 1)?"house":"houses"} on ${this.Properties[PropertyIndex].Name}!`)
     }
 
     Sell(message) {
@@ -835,14 +837,11 @@ class Game {
         let Arg = message.content.split(" ")[1]
         let Money = parseInt(message.content.split(" ")[3])
         let reciever = message.mentions.members.first();
-        if (!reciever || !Arg || !Money) return message.reply(".sell [property] [reciever] [cost]")
-        reciever = this.Players.get(reciever.id)
-        if (!reciever) return message.reply("invalid reciever!")
-        if (reciever == this.Players.get(message.author.id)) return message.channel.send("You can't ")
+        if (!Arg) return message.reply("!sell [first word of property] [reciever] [cost]")
         let FoundHouseIndex;
         for (let i = 0; i < this.Properties.length; i++) {
             const CurrentProperty = this.Properties[i]
-            if (CurrentProperty.Name.toLowerCase().includes(Arg.toLowerCase()) && CurrentProperty.Owner.ID == this.CurrentPlayer.ID) {
+            if (CurrentProperty.Owner && CurrentProperty.Name.toLowerCase().includes(Arg.toLowerCase()) && CurrentProperty.Owner.ID == this.CurrentPlayer.ID) {
                 if (FoundHouseIndex) {
                     return message.reply("you have to be more specific with the property name")
                 } else {
@@ -856,6 +855,10 @@ class Game {
             this.Properties[FoundHouseIndex].Houses--;
             message.reply(`you sold 1 house for $${Math.round(this.Properties[FoundHouseIndex].Building / 2)} and now have ${this.Properties[FoundHouseIndex].Houses} ${(this.Properties[FoundHouseIndex].Houses == 1)?"house":"houses"} on it!`)
         } else {
+            if (!reciever) return message.reply("!sell [property] [reciever] [amount]")
+            reciever = this.Players.get(reciever.id)
+            if (!reciever) return message.reply("invalid reciever!")
+            if (reciever == this.Players.get(message.author.id)) return message.channel.send("You can't sell to yourself")    
             switch (this.Properties[FoundHouseIndex].Color) {
                 case "DARK_ORANGE":
                     if (this.Properties[1].Houses > 0) {
@@ -942,17 +945,19 @@ class Game {
             Player.CurrentOffer = null;
             return message.reply("someone already bought it!")
         }
-        let answer = message.content.split(" ")[1].toLowerCase();
+        let answer = message.content.split(" ")[1];
         let amount = parseInt(message.content.split(" ")[2]);
         if ((!answer) || (answer != "deny" && !amount)) return message.reply(".offer [confirm|deny] [amount]")
+        answer = answer.toLowerCase();
         if (answer == "confirm") {
             if (amount == Player.CurrentOffer.Price) {
                 Property.Buy(Player)
                 Player.Worth += Property.Price;
-                Player.RemoveMoney(message, Player.CurrentOffer.Price, this.Players.get(PLayer.CurrentOffer.OriginalOwner.ID))
+                Player.RemoveMoney(message, Player.CurrentOffer.Price, this.Players.get(Player.CurrentOffer.OriginalOwner.ID))
                 this.Players.get(Player.CurrentOffer.OriginalOwner.ID).AddMoney(message, Player.CurrentOffer.Price)
+                message.reply(`you bought ${Property.Name} for $${Player.CurrentOffer.Price}`);
                 Player.CurrentOffer = null;
-                return message.reply(`you bought ${Property.Name} for $${Player.CurrentOffer.Price}`);
+                return;
             } else {
                 return message.reply(`the price is $${Player.CurrentOffer.Price}. Either .offer confirm ${Player.CurrentOffer.Price} or .offer deny`)
             }
@@ -1149,6 +1154,8 @@ class Game {
 bot.login(botconfig.token)
 
 bot.on("ready", async () => {
+    bot.user.setActivity("Monopoly", {type: "PLAYING"})
+
     console.log(`${bot.user.username} is online!`)
 })
 
@@ -1186,7 +1193,7 @@ bot.on("message", async (message) => {
                     .addField(`${prefix}end`, "Ends your turn", true)
                     .addField(`${prefix}bid`, "Bid for the auction", true)
                     .addField(`${prefix}house`, "Buy houses", true)
-                    .addField(`${prefix}sell [property] [reciever] [cost]`, "Sell property", true)
+                    .addField(`${prefix}sell [first word of property] [reciever] [cost]`, "Sell property", true)
                     .addField(`${prefix}offer`, "Accept or deny an offer from another player", true)
                     .addField(`${prefix}mortgage`, "Put property up for mortgage", true)
                     .addField(`${prefix}unmortgage`, "Rebuy property", true)

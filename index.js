@@ -160,13 +160,16 @@ class Player {
         this.Worth = 0;
         this.JailTime = 0;
         this.CurrentOffer = null;
+        this.PaidPlayer = null;
     }
 
-    RemoveMoney(message, num) {
+    RemoveMoney(message, num, OtherPlayer) {
         this.Money -= parseInt(num)
         if (this.Money < 0) {
-            message.channel.send(`<@${this.ID}> you are in debt!`)
+            message.channel.send(`<@${this.ID}> you are in debt!! If you are still in debt when you end your turn you will lose!`)
+            this.PaidPlayer = OtherPlayer
 
+            Game.Players.delete(this.ID)
         }
     }
 
@@ -356,7 +359,7 @@ class Game {
                     message.reply("Used one of your get out of jail free cards and got out of jail!")
                 } else {
                     if (this.CurrentPlayer.JailTime == 3) {
-                        this.CurrentPlayer.RemoveMoney(message, 50);
+                        this.CurrentPlayer.RemoveMoney(message, 50, null);
                         this.CurrentPlayer.Move(message, Dice1 + Dice2, this.Properties)
                         this.CurrentPlayer.Jailed = false;
                         message.reply("Payed 50 dollars and got out of jail.")
@@ -399,7 +402,7 @@ class Game {
                 }
             } else if (card.CollectFromPlayers) {
                 if (card.Money < 0) {
-                    this.CurrentPlayer.RemoveMoney(message, (this.Players.size * card.Money) * -1)
+                    this.CurrentPlayer.RemoveMoney(message, (this.Players.size * card.Money) * -1, null)
                     Message += ` You lost $${this.Players.size * card.Money * -1} and now have $${this.CurrentPlayer.Money}`
                     this.Players.array().forEach(player => {
                         if (player.ID != this.CurrentPlayer.ID) {
@@ -411,14 +414,14 @@ class Game {
                     Message += ` You collected $${this.Players.size * card.Money} and now have $${this.CurrentPlayer.Money}`
                     this.Players.array().forEach(player => {
                         if (player.ID != this.CurrentPlayer.ID) {
-                            player.RemoveMoney(message, card.Money)
+                            player.RemoveMoney(message, card.Money, null)
                         }
                     });
                 }
 
             } else {
                 if (card.Money < 0) {
-                    this.CurrentPlayer.RemoveMoney(message, card.Money * -1)
+                    this.CurrentPlayer.RemoveMoney(message, card.Money * -1, null)
                 } else {
                     this.CurrentPlayer.AddMoney(message, card.Money)
                 }
@@ -427,11 +430,11 @@ class Game {
             message.reply(Message)
         } else if (CurrentProperty.Color == "Tax") {
             if ((this.CurrentPlayer.Money + this.CurrentPlayer.Worth) * 0.1 < 200) {
-                this.CurrentPlayer.RemoveMoney(message, (this.CurrentPlayer.Money + this.CurrentPlayer.Worth) * 0.1)
+                this.CurrentPlayer.RemoveMoney(message, (this.CurrentPlayer.Money + this.CurrentPlayer.Worth) * 0.1, null)
                 message.reply(`you landed on ${CurrentProperty.Name} and payed $${(this.CurrentPlayer.Money + this.CurrentPlayer.Worth) * 0.1} (10%). You now have $${this.CurrentPlayer.Money}`)
 
             } else {
-                this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent)
+                this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent, null)
                 message.reply(`you landed on ${CurrentProperty.Name} and payed $${CurrentProperty.Rent}. You now have $${this.CurrentPlayer.Money}`)
             }
         } else if (CurrentProperty.Color == "Jail") {
@@ -443,7 +446,7 @@ class Game {
                     if (CurrentProperty.Mortgaged) {
                         message.reply(`You landed on <@${CurrentProperty.Owner.ID}>'s ${CurrentProperty.Name} but its mortgaged...`)
                     } else {
-                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Owner.Utility])
+                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Owner.Utility], CurrentProperty.Owner)
                         CurrentProperty.Owner.AddMoney(message, CurrentProperty.Rent[CurrentProperty.Owner.Utility])
                         message.reply(`You landed on <@${CurrentProperty.Owner.ID}>'s ${CurrentProperty.Name} and paid him $${CurrentProperty.Rent[CurrentProperty.Owner.Utility]}. You now have ${this.CurrentPlayer.Money}`)
                     }
@@ -465,7 +468,7 @@ class Game {
                 if (CurrentProperty.Mortgaged) {
                     message.reply(`You landed on <@${CurrentProperty.Owner.ID}>'s ${CurrentProperty.Name} but its mortgaged...`)
                 } else {
-                    this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Owner.RR])
+                    this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Owner.RR], CurrentProperty.Owner)
                     CurrentProperty.Owner.AddMoney(message, CurrentProperty.Rent[CurrentProperty.Owner.RR])
                     message.reply(`You landed on <@${CurrentProperty.Owner.ID}>'s ${CurrentProperty.Name} and payed him $${CurrentProperty.Rent[CurrentProperty.Owner.RR]}`)
                 }
@@ -481,39 +484,39 @@ class Game {
                     } else {
                         if (CurrentProperty.Houses > 0) {
                             message.reply(`You landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed him $${CurrentProperty.Rent[CurrentProperty.Houses]}!`)
-                            this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses])
+                            this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses], CurrentProperty.Owner)
                             CurrentProperty.Owner.AddMoney(message, CurrentProperty.Rent[CurrentProperty.Houses])
                         } else {
                             switch (CurrentProperty.Color) {
                                 case "DARK_ORANGE":
                                     if (CurrentProperty.Owner.Brown < 2) {
-                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses])
+                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses], CurrentProperty.Owner)
                                         CurrentProperty.Owner.AddMoney(message, CurrentProperty.Rent[CurrentProperty.Houses])
                                         message.reply(`You landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed him $${CurrentProperty.Rent[CurrentProperty.Houses]}!`)
                                     } else {
-                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2)
+                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2, CurrentProperty.Owner)
                                         CurrentProperty.Owner.AddMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2)
                                         message.reply(`You landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed him $${CurrentProperty.Rent[CurrentProperty.Houses] * 2}!`)
                                     }
                                     break;
                                 case "BLUE":
                                     if (CurrentProperty.Owner.LightBlue < 3) {
-                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses])
+                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses], CurrentProperty.Owner)
                                         CurrentProperty.Owner.AddMoney(message, CurrentProperty.Rent[CurrentProperty.Houses])
                                         message.reply(`You landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed him $${CurrentProperty.Rent[CurrentProperty.Houses]}!`)
                                     } else {
-                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2)
+                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2, CurrentProperty.Owner)
                                         CurrentProperty.Owner.AddMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2)
                                         message.reply(`You landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed him $${CurrentProperty.Rent[CurrentProperty.Houses] * 2}!`)
                                     }
                                     break;
                                 case "LUMINOUS_VIVID_PINK":
                                     if (CurrentProperty.Owner.Pink < 3) {
-                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses])
+                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses], CurrentProperty.Owner)
                                         CurrentProperty.Owner.AddMoney(message, CurrentProperty.Rent[CurrentProperty.Houses])
                                         message.reply(`You landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed him $${CurrentProperty.Rent[CurrentProperty.Houses]}!`)
                                     } else {
-                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2)
+                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2, CurrentProperty.Owner)
                                         CurrentProperty.Owner.AddMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2)
                                         message.reply(`You landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed him $${CurrentProperty.Rent[CurrentProperty.Houses] * 2}!`)
 
@@ -521,11 +524,11 @@ class Game {
                                     break;
                                 case "ORANGE":
                                     if (CurrentProperty.Owner.Orange < 3) {
-                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses])
+                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses], CurrentProperty.Owner)
                                         CurrentProperty.Owner.AddMoney(message, CurrentProperty.Rent[CurrentProperty.Houses])
                                         message.reply(`You landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed him $${CurrentProperty.Rent[CurrentProperty.Houses]}!`)
                                     } else {
-                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2)
+                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2, CurrentProperty.Owner)
                                         CurrentProperty.Owner.AddMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2)
                                         message.reply(`You landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed him $${CurrentProperty.Rent[CurrentProperty.Houses] * 2}!`)
 
@@ -533,11 +536,11 @@ class Game {
                                     break;
                                 case "DARK_RED":
                                     if (CurrentProperty.Owner.Red < 3) {
-                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses])
+                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses], CurrentProperty.Owner)
                                         CurrentProperty.Owner.AddMoney(message, CurrentProperty.Rent[CurrentProperty.Houses])
                                         message.reply(`You landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed him $${CurrentProperty.Rent[CurrentProperty.Houses]}!`)
                                     } else {
-                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2)
+                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2, CurrentProperty.Owner)
                                         CurrentProperty.Owner.AddMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2)
                                         message.reply(`You landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed him $${CurrentProperty.Rent[CurrentProperty.Houses] * 2}!`)
 
@@ -545,11 +548,11 @@ class Game {
                                     break;
                                 case "GOLD":
                                     if (CurrentProperty.Owner.Yellow < 3) {
-                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses])
+                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses], CurrentProperty.Owner)
                                         CurrentProperty.Owner.AddMoney(message, CurrentProperty.Rent[CurrentProperty.Houses])
                                         message.reply(`You landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed him $${CurrentProperty.Rent[CurrentProperty.Houses]}!`)
                                     } else {
-                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2)
+                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2, CurrentProperty.Owner)
                                         CurrentProperty.Owner.AddMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2)
                                         message.reply(`You landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed him $${CurrentProperty.Rent[CurrentProperty.Houses] * 2}!`)
 
@@ -558,11 +561,11 @@ class Game {
                                     break;
                                 case "DARK_GREEN":
                                     if (CurrentProperty.Owner.Green < 3) {
-                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses])
+                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses], CurrentProperty.Owner)
                                         CurrentProperty.Owner.AddMoney(message, CurrentProperty.Rent[CurrentProperty.Houses])
                                         message.reply(`You landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed him $${CurrentProperty.Rent[CurrentProperty.Houses]}!`)
                                     } else {
-                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2)
+                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2, CurrentProperty.Owner)
                                         CurrentProperty.Owner.AddMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2)
                                         message.reply(`You landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed him $${CurrentProperty.Rent[CurrentProperty.Houses] * 2}!`)
 
@@ -570,11 +573,11 @@ class Game {
                                     break;
                                 case "DARK_BLUE":
                                     if (CurrentProperty.Owner.DarkBlue < 2) {
-                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses])
+                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses], CurrentProperty.Owner)
                                         CurrentProperty.Owner.AddMoney(message, CurrentProperty.Rent[CurrentProperty.Houses])
                                         message.reply(`You landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed him $${CurrentProperty.Rent[CurrentProperty.Houses]}!`)
                                     } else {
-                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2)
+                                        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2, CurrentProperty.Owner)
                                         CurrentProperty.Owner.AddMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2)
                                         message.reply(`You landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed him $${CurrentProperty.Rent[CurrentProperty.Houses] * 2}!`)
 
@@ -641,7 +644,7 @@ class Game {
         if (!CurrentProperty.Price) return message.reply("you can't buy this!")
         if (CurrentProperty.Owner) return message.reply(`<@${CurrentProperty.Owner.ID}> already owns this!`)
         if (CurrentProperty.Price > this.CurrentPlayer.Money) return message.reply("you don't have enough money to buy this!")
-        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Price);
+        this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Price, null);
         CurrentProperty.Buy(this.CurrentPlayer)
         this.CurrentPlayer.Worth += CurrentProperty.Price;
         message.reply(`you bought ${CurrentProperty.Name}!`)
@@ -669,6 +672,32 @@ class Game {
                 message.channel.send(`<@${this.CurrentPlayer.ID}> it's your turn!`)
             }
         }
+
+        if (this.CurrentPlayer.Money <= 0) {
+            message.channel.send(`<@${this.CurrentPlayer.ID}> went bankrupt!`)
+            if (this.CurrentPlayer.PaidPlayer) {
+                let MoneyForNewPlayer = 0;
+                for (let i = 0; i < this.Properties.length; i++) {
+                    const CurrentProperty = this.Properties[i]
+                    if (CurrentProperty.Owner && CurrentProperty.Owner.ID == this.CurrentPlayer.ID) {
+                        for (let j = CurrentProperty.Houses; j > 0; j--) {
+                            CurrentProperty.Houses--;
+                            MoneyForNewPlayer += Math.round(CurrentProperty.Building / 2)
+                        }
+                        CurrentProperty.Buy(MoneyForNewPlayer)
+                    }
+                }
+                this.CurrentPlayer.PaidPlayer.AddMoney(message, MoneyForNewPlayer)
+            } else {
+                
+            }
+
+            this.Players.delete(this.CurrentPlayer.ID)
+            if (this.Players.size == 1) {
+                message.channel.send(`CONGRATS <@${this.Players[0].ID}> YOU HAVE WON!`)
+                bot.games.delete(message.channel.id)
+            }
+        }
     }
 
     Auction(message) {
@@ -685,7 +714,7 @@ class Game {
                 const winner = this.Players.get(this.Bidders[0].ID)
                 const CurrentProperty = this.Properties[this.CurrentPlayer.Position]
                 message.channel.send(`<@${winner.ID}> congrats you won ${this.Properties[this.CurrentPlayer.Position].Name} for $${this.HighestBid}`)
-                winner.RemoveMoney(message, this.HighestBid);
+                winner.RemoveMoney(message, this.HighestBid, null);
                 CurrentProperty.Buy(winner)
                 this.CurrentPlayer.Rolled = false;
                 if (this.CurrentPlayer.Doubles) {
@@ -773,7 +802,7 @@ class Game {
             }
         }
         if (!PropertyIndex) return message.reply("you can't buy a house on anything!")
-        this.CurrentPlayer.RemoveMoney(message, this.Properties[PropertyIndex].Building)
+        this.CurrentPlayer.RemoveMoney(message, this.Properties[PropertyIndex].Building, null)
         this.Properties[PropertyIndex].Houses++;
         message.reply(`you spent $${this.Properties[PropertyIndex].Building} and now have ${this.Properties[PropertyIndex].Houses} ${(this.Properties[PropertyIndex].Houses == 1)?"house":"houses"} on it!`)
     }
@@ -896,7 +925,7 @@ class Game {
         if (answer == "confirm") {
             if (amount == Player.CurrentOffer.Price) {
                 Property.Buy(Player)
-                Player.RemoveMoney(message, Player.CurrentOffer.Price)
+                Player.RemoveMoney(message, Player.CurrentOffer.Price, this.Players.get(PLayer.CurrentOffer.OriginalOwner.ID))
                 this.Players.get(Player.CurrentOffer.OriginalOwner.ID).AddMoney(message, Player.CurrentOffer.Price)
                 Player.CurrentOffer = null;
                 return message.reply(`you bought ${Property.Name} for $${Player.CurrentOffer.Price}`);
@@ -1039,7 +1068,7 @@ class Game {
         const Price = FoundHouse.Mortgage * 1.10;
 
         if (Price > this.CurrentPlayer.Money) return message.reply(`you don't have enough money to unmortgage it for $${Price}.`)
-    
+
         switch (FoundHouse.Color) {
             case "DARK_ORANGE":
                 FoundHouse.Owner.Orange++;
@@ -1067,7 +1096,7 @@ class Game {
                 break;
         }
 
-        this.CurrentPlayer.RemoveMoney(message, Price)
+        this.CurrentPlayer.RemoveMoney(message, Price, null)
 
         FoundHouse.Mortgaged = false;
     }

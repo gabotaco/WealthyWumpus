@@ -655,25 +655,8 @@ class Game {
         if (message.author.id != this.CurrentPlayer.ID) return message.reply('its not your turn')
         if (!this.CurrentPlayer.Rolled) return message.reply("you haven't rolled yet")
 
-        if (!this.Properties[this.CurrentPlayer.Position].Owner && this.Properties.Price) {
-            this.Bidding = true;
-            this.HighestBid = 0
-            this.Bidders = this.Players.concat().array()
-            this.BiddersIndex = this.CurrentPlayerIndex;
-            message.channel.send(`Let the bidding begin! <@${this.Bidders[this.BiddersIndex].ID}> type !bid [amount] to place a bid or type !bid quit to back out.`)
-        } else {
-            this.CurrentPlayer.Rolled = false;
-            if (this.CurrentPlayer.Doubles) {
-                message.reply("roll again!")
-            } else {
-                this.CurrentPlayerIndex++;
-                if (this.CurrentPlayerIndex >= this.Players.size) this.CurrentPlayerIndex = 0;
-                this.CurrentPlayer = this.Players.array()[this.CurrentPlayerIndex]
-                message.channel.send(`<@${this.CurrentPlayer.ID}> it's your turn!`)
-            }
-        }
-
         if (this.CurrentPlayer.Money <= 0) {
+            this.Players.delete(this.CurrentPlayer.ID)
             message.channel.send(`<@${this.CurrentPlayer.ID}> went bankrupt!`)
             if (this.CurrentPlayer.PaidPlayer) {
                 let MoneyForNewPlayer = 0;
@@ -689,13 +672,39 @@ class Game {
                 }
                 this.CurrentPlayer.PaidPlayer.AddMoney(message, MoneyForNewPlayer)
             } else {
-                
+                this.CurrentPlayerIndex--;
+                for (let i = 0; i < this.Properties.length; i++) {
+                    const CurrentProperty = this.Properties[i]
+                    if (CurrentProperty.Owner && CurrentProperty.Owner.ID == this.CurrentPlayer.ID) {
+                        CurrentProperty.Houses = 0;
+                        CurrentProperty.Owner = null
+                        CurrentProperty.Mortgaged = false;
+                    }
+                }
+
             }
 
-            this.Players.delete(this.CurrentPlayer.ID)
             if (this.Players.size == 1) {
                 message.channel.send(`CONGRATS <@${this.Players[0].ID}> YOU HAVE WON!`)
                 bot.games.delete(message.channel.id)
+            }
+        }
+
+        if (!this.Properties[this.CurrentPlayer.Position].Owner && this.Properties.Price) {
+            this.Bidding = true;
+            this.HighestBid = 0
+            this.Bidders = this.Players.concat().array()
+            this.BiddersIndex = this.CurrentPlayerIndex;
+            message.channel.send(`Let the bidding begin! <@${this.Bidders[this.BiddersIndex].ID}> type !bid [amount] to place a bid or type !bid quit to back out.`)
+        } else {
+            this.CurrentPlayer.Rolled = false;
+            if (this.CurrentPlayer.Doubles && this.CurrentPlayer.Money > 0) {
+                message.reply("roll again!")
+            } else {
+                this.CurrentPlayerIndex++;
+                if (this.CurrentPlayerIndex >= this.Players.size) this.CurrentPlayerIndex = 0;
+                this.CurrentPlayer = this.Players.array()[this.CurrentPlayerIndex]
+                message.channel.send(`<@${this.CurrentPlayer.ID}> it's your turn!`)
             }
         }
     }

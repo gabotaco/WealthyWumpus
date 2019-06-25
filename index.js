@@ -168,10 +168,6 @@ class Player {
             message.reply("you passed go!")
         }
     }
-
-    MoveTo(message, position) {
-
-    }
 }
 
 class Game {
@@ -379,10 +375,10 @@ class Game {
             if ((this.CurrentPlayer.Money + this.CurrentPlayer.Worth) * 0.1 < 200) {
                 this.CurrentPlayer.RemoveMoney(message, (this.CurrentPlayer.Money + this.CurrentPlayer.Worth) * 0.1)
                 message.reply(`you landed on ${CurrentProperty.Name} and payed $${(this.CurrentPlayer.Money + this.CurrentPlayer.Worth) * 0.1} (10%). You now have $${this.CurrentPlayer.Money}`)
-    
+
             } else {
                 this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent)
-                message.reply(`you landed on ${CurrentProperty.Name} and payed $${CurrentProperty.Rent}. You now have $${this.CurrentPlayer.Money}`)    
+                message.reply(`you landed on ${CurrentProperty.Name} and payed $${CurrentProperty.Rent}. You now have $${this.CurrentPlayer.Money}`)
             }
         } else if (CurrentProperty.Color == "Jail") {
             if (!this.CurrentPlayer.Jailed) message.reply("you are just visiting jail.")
@@ -556,7 +552,7 @@ class Game {
             this.CurrentPlayer.Doubles = false;
             this.CurrentPlayer.DoublesStreak = 0;
         }
-        
+
     }
 
     Stats(message) {
@@ -665,7 +661,67 @@ class Game {
         if (!this.InProgress) return message.reply("the game hasen't started yet!")
         if (message.author.id != this.CurrentPlayer.ID) return message.reply('its not your turn')
 
-        
+        let LeastHouses = 10;
+        let PropertyIndex;
+        for (let i = 0; i < this.Properties.length; i++) {
+            const CurrentProperty = this.Properties[i]
+            if (CurrentProperty.Houses < LeastHouses && CurrentProperty.Owner.ID == this.CurrentPlayer.ID && CurrentProperty.Building <= this.CurrentPlayer.Money && CurrentProperty.Houses < 5) {
+                switch (CurrentProperty.Color) {
+                    case "DARK_ORANGE":
+                        if (CurrentProperty.Owner.Brown == 2) {
+                            LeastHouses = CurrentProperty.Houses;
+                            PropertyIndex = i;
+                        }
+                        break;
+                    case "BLUE":
+                        if (CurrentProperty.Owner.LightBlue == 3) {
+                            LeastHouses = CurrentProperty.Houses;
+                            PropertyIndex = i;
+                        }
+                        break;
+                    case "LUMINOUS_VIVID_PINK":
+                        if (CurrentProperty.Owner.Pink == 3) {
+                            LeastHouses = CurrentProperty.Houses;
+                            PropertyIndex = i;
+                        }
+                        break;
+                    case "ORANGE":
+                        if (CurrentProperty.Owner.Orange == 3) {
+                            LeastHouses = CurrentProperty.Houses;
+                            PropertyIndex = i;
+                        }
+                        break;
+                    case "DARK_RED":
+                        if (CurrentProperty.Owner.Red == 3) {
+                            LeastHouses = CurrentProperty.Houses;
+                            PropertyIndex = i;
+                        }
+                        break;
+                    case "GOLD":
+                        if (CurrentProperty.Owner.Yellow == 3) {
+                            LeastHouses = CurrentProperty.Houses;
+                            PropertyIndex = i;
+                        }
+                        break;
+                    case "DARK_GREEN":
+                        if (CurrentProperty.Owner.Green == 3) {
+                            LeastHouses = CurrentProperty.Houses;
+                            PropertyIndex = i;
+                        }
+                        break;
+                    case "DARK_BLUE":
+                        if (CurrentProperty.Owner.DarkBlue == 2) {
+                            LeastHouses = CurrentProperty.Houses;
+                            PropertyIndex = i;
+                        }
+                        break;
+                }
+            }
+        }
+        if (!PropertyIndex) return message.reply("you can't buy a house on anything!")
+        this.CurrentPlayer.RemoveMoney(message, this.Properties[PropertyIndex].Building)
+        this.Properties[PropertyIndex].Houses++;
+        message.reply(`you spent $${this.Properties[PropertyIndex].Building} and now have ${this.Properties[PropertyIndex].Houses} ${(this.Properties[PropertyIndex].Houses == 1)?"house":"houses"} on it!`)
     }
 }
 

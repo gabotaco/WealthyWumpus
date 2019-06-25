@@ -127,6 +127,14 @@ class Property {
     }
 }
 
+class Offer {
+    constructor(PropertyIndex, Price, OriginalOwner) {
+        this.PropertyIndex = PropertyIndex;
+        this.Price = Price;
+        this.OriginalOwner = OriginalOwner;
+    }
+}
+
 class Player {
     constructor(ID) {
         this.Position = 0;
@@ -149,6 +157,7 @@ class Player {
         this.DoublesStreak = 0;
         this.Worth = 0;
         this.JailTime = 0;
+        this.CurrentOffer = null;
     }
 
     RemoveMoney(message, num) {
@@ -187,45 +196,85 @@ class Game {
         this.CurrentPlayer = null;
 
         this.Properties = [
+            /* 0 */
             new Property("GO", 0, "GO"),
+            /* 1 */
             new Property("Mediterranean Avenue (Brown)", [2, 10, 30, 90, 160, 250], "DARK_ORANGE", 60, 30, 50),
+            /* 2 */
             new Property("Community Chest", 0, "Chest"),
+            /* 3 */
             new Property("Baltic Avenue (Brown)", [4, 20, 60, 180, 320, 450], "DARK_ORANGE", 60, 30, 50),
+            /* 4 */
             new Property("Income Tax", 200, "Tax"),
+            /* 5 */
             new Property("Reading Railroad", [0, 25, 50, 100, 200], "RR", 200, 100, 0),
+            /* 6 */
             new Property("Oriental Avenue (Light Blue)", [6, 30, 90, 270, 400, 550], "BLUE", 100, 50, 50),
+            /* 7 */
             new Property("Chance", 0, "Chance"),
+            /* 8 */
             new Property("Vermont Avenue (Light Blue)", [6, 30, 90, 270, 400, 550], "BLUE", 100, 50, 50),
+            /* 9 */
             new Property("Connecticut Avenue (Light Blue)", [8, 40, 100, 300, 450, 600], "BLUE", 120, 60, 50),
+            /* 10 */
             new Property("Jail", 0, "Jail"),
+            /* 11 */
             new Property("St. Charles Place (Pink)", [10, 50, 150, 450, 625, 750], "LUMINOUS_VIVID_PINK", 140, 70, 100),
+            /* 12 */
             new Property("Electric Company", [0, 4, 10], "Utility", 150, 75, 0),
+            /* 13 */
             new Property("States Avenue (Pink)", [10, 50, 150, 450, 625, 750], "LUMINOUS_VIVID_PINK", 140, 70, 100),
+            /* 14 */
             new Property("Virginia Avenue (Pink)", [12, 60, 180, 500, 700, 900], "LUMINOUS_VIVID_PINK", 160, 80, 100),
+            /* 15 */
             new Property("Pennsylvania Railroad", [0, 25, 50, 100, 200], "RR", 200, 100, 0),
+            /* 16 */
             new Property("St. James Place (Orange)", [14, 70, 200, 550, 750, 950], "ORANGE", 180, 90, 100),
+            /* 17 */
             new Property("Community Chest", 0, "Chest"),
+            /* 18 */
             new Property("Tennessee Avenue (Orange)", [14, 70, 200, 550, 750, 950], "ORANGE", 180, 90, 100),
+            /* 19 */
             new Property("New York Avenue (Orange)", [16, 80, 220, 600, 800, 1000], "ORANGE", 200, 100, 100),
+            /* 20 */
             new Property("Free Parking", 0, "Parking"),
+            /* 21 */
             new Property("Kentucky Avenue (Red)", [18, 90, 250, 700, 875, 1050], "DARK_RED", 220, 110, 150),
+            /* 22 */
             new Property("Chance", 0, "Chance"),
+            /* 23 */
             new Property("Indiana Avenue (Red)", [18, 90, 250, 700, 875, 1050], "DARK_RED", 220, 110, 150),
+            /* 24 */
             new Property("Illinois Avenue (Red)", [20, 100, 300, 750, 925, 1100], "DARK_RED", 240, 120, 150),
+            /* 25 */
             new Property("B. & O. Railroad", [0, 25, 50, 100, 200], "RR", 200, 100, 0),
+            /* 26 */
             new Property("Atlantic Avenue (Yellow)", [22, 110, 330, 800, 975, 1150], "GOLD", 260, 130, 150),
+            /* 27 */
             new Property("Ventnor Avenue (Yellow)", [22, 110, 330, 800, 975, 1150], "GOLD", 260, 130, 150),
+            /* 28 */
             new Property("Water Works", [0, 4, 10], "Utility", 150, 75, 0),
+            /* 29 */
             new Property("Marvin Gardens (Yellow)", [24, 120, 360, 850, 1025, 1200], "GOLD", 280, 140, 150),
+            /* 30 */
             new Property("Go To Jail", 0, "Go To Jail"),
+            /* 31 */
             new Property("Pacific Avenue (Green)", [26, 130, 390, 900, 1100, 1275], "DARK_GREEN", 300, 150, 200),
+            /* 32 */
             new Property("North Carolina Avenue (Green)", [26, 130, 390, 900, 1100, 1275], "DARK_GREEN", 300, 150, 200),
+            /* 33 */
             new Property("Community Chest", 0, "Chest"),
+            /* 34 */
             new Property("Pennsylvania Avenue (Green)", [28, 150, 450, 1000, 1200, 1400], "DARK_GREEN", 320, 160, 200),
+            /* 35 */
             new Property("Short Line", [0, 25, 50, 100, 200], "RR", 200, 100, 0),
+            /* 36 */
             new Property("Chance", 0, "Chance"),
+            /* 37 */
             new Property("Park Place (Dark Blue)", [35, 175, 500, 1100, 1300, 1500], "DARK_BLUE", 350, 175, 200),
+            /* 38 */
             new Property("Luxury Tax", 100, "Tax"),
+            /* 39 */
             new Property("Boardwalk (Dark Blue)", [50, 200, 600, 1400, 1700, 2000], "DARK_BLUE", 400, 200, 200)
         ]
 
@@ -725,7 +774,135 @@ class Game {
     }
 
     Sell(message) {
+        if (!this.InProgress) return message.reply("the game hasen't started yet!")
+        if (message.author.id != this.CurrentPlayer.ID) return message.reply('its not your turn')
 
+        let Arg = message.content.split(" ")[1]
+        let Money = parseInt(message.content.split(" ")[3])
+        const reciever = this.Players.get(message.mentions.members.first().id);
+        if (!reciever || !Arg || !Money) return message.reply(".sell [property] [reciever] [cost]")
+        if (reciever == this.Players.get(message.author.id)) return message.channel.send("You can't ")
+        let FoundHouseIndex;
+        for (let i = 0; i < this.Properties.length; i++) {
+            const CurrentProperty = this.Properties[i]
+            if (CurrentProperty.Name.toLowerCase().includes(Arg.toLowerCase())) {
+                if (FoundHouseIndex) {
+                    return message.reply("you have to be more specific with the property name")
+                } else {
+                    FoundHouseIndex = i
+                }
+            }
+        }
+        if (!FoundHouseIndex) return message.reply("couldn't find that property")
+        if (this.Properties[FoundHouseIndex].Houses > 0) {
+            this.CurrentPlayer.AddMoney(message, Math.round(this.Properties[FoundHouseIndex].Building / 2));
+            this.Properties[FoundHouseIndex].Houses--;
+            message.reply(`you sold 1 house for $${Math.round(this.Properties[FoundHouseIndex].Building / 2)} and now have ${this.Properties[FoundHouseIndex].Houses} ${(this.Properties[FoundHouseIndex].Houses == 1)?"house":"houses"} on it!`)
+        } else {
+            switch (this.Properties[FoundHouseIndex].Color) {
+                case "DARK_ORANGE":
+                    if (this.Properties[1].Houses > 0) {
+                        return message.reply(`you have to sell all the houses on ${this.Properties[1].Name} first!`)
+                    } else if (this.Properties[3].Houses > 0) {
+                        return message.reply(`you have to sell all the houses on ${this.Properties[3].Name} first!`)
+                    }
+                    break;
+                case "BLUE":
+                    if (this.Properties[6].Houses > 0) {
+                        return message.reply(`you have to sell all the houses on ${this.Properties[6].Name} first!`)
+                    } else if (this.Properties[8].Houses > 0) {
+                        return message.reply(`you have to sell all the houses on ${this.Properties[8].Name} first!`)
+                    } else if (this.Properties[9].Houses > 0) {
+                        return message.reply(`you have to sell all the houses on ${this.Properties[9].Name} first!`)
+                    }
+                    break;
+                case "LUMINOUS_VIVID_PINK":
+                    if (this.Properties[11].Houses > 0) {
+                        return message.reply(`you have to sell all the houses on ${this.Properties[11].Name} first!`)
+                    } else if (this.Properties[13].Houses > 0) {
+                        return message.reply(`you have to sell all the houses on ${this.Properties[13].Name} first!`)
+                    } else if (this.Properties[14].Houses > 0) {
+                        return message.reply(`you have to sell all the houses on ${this.Properties[14].Name} first!`)
+                    }
+                    break;
+                case "ORANGE":
+                    if (this.Properties[16].Houses > 0) {
+                        return message.reply(`you have to sell all the houses on ${this.Properties[16].Name} first!`)
+                    } else if (this.Properties[18].Houses > 0) {
+                        return message.reply(`you have to sell all the houses on ${this.Properties[18].Name} first!`)
+                    } else if (this.Properties[19].Houses > 0) {
+                        return message.reply(`you have to sell all the houses on ${this.Properties[19].Name} first!`)
+                    }
+                    break;
+                case "DARK_RED":
+                    if (this.Properties[21].Houses > 0) {
+                        return message.reply(`you have to sell all the houses on ${this.Properties[21].Name} first!`)
+                    } else if (this.Properties[23].Houses > 0) {
+                        return message.reply(`you have to sell all the houses on ${this.Properties[23].Name} first!`)
+                    } else if (this.Properties[24].Houses > 0) {
+                        return message.reply(`you have to sell all the houses on ${this.Properties[24].Name} first!`)
+                    }
+                    break;
+                case "GOLD":
+                    if (this.Properties[26].Houses > 0) {
+                        return message.reply(`you have to sell all the houses on ${this.Properties[26].Name} first!`)
+                    } else if (this.Properties[27].Houses > 0) {
+                        return message.reply(`you have to sell all the houses on ${this.Properties[27].Name} first!`)
+                    } else if (this.Properties[29].Houses > 0) {
+                        return message.reply(`you have to sell all the houses on ${this.Properties[29].Name} first!`)
+                    }
+                    break;
+                case "DARK_GREEN":
+                    if (this.Properties[31].Houses > 0) {
+                        return message.reply(`you have to sell all the houses on ${this.Properties[31].Name} first!`)
+                    } else if (this.Properties[32].Houses > 0) {
+                        return message.reply(`you have to sell all the houses on ${this.Properties[32].Name} first!`)
+                    } else if (this.Properties[34].Houses > 0) {
+                        return message.reply(`you have to sell all the houses on ${this.Properties[34].Name} first!`)
+                    }
+                    break;
+                case "DARK_BLUE":
+                    if (this.Properties[37].Houses > 0) {
+                        return message.reply(`you have to sell all the houses on ${this.Properties[37].Name} first!`)
+                    } else if (this.Properties[39].Houses > 0) {
+                        return message.reply(`you have to sell all the houses on ${this.Properties[39].Name} first!`)
+                    }
+                    break;
+            }
+            if (reciever.CurrentOffer) return message.reply("they have a pending offer already!")
+            reciever.CurrentOffer = new Offer(FoundHouseIndex, Money, this.CurrentPlayer)
+            message.channel.send(`<@${reciever.ID}>, <@${message.author.id}> has offered you ${this.Properties[FoundHouseIndex].Name} for $${Money}`)
+        }
+    }
+
+    Offer(message) {
+        if (!this.InProgress) return message.reply(`the game hasen't started yet!`)
+        if (!this.Players.has(message.author.id)) return message.reply("you aren't in the game!")
+        const Player = this.Players.get(message.author.id);
+        if (!Player.CurrentOffer) return message.reply("you don't have a pending offer")
+        const Property = this.Properties[Player.CurrentOffer.PropertyIndex]
+        if (Player.CurrentOffer.OriginalOwner != Property.Owner.ID) {
+            Player.CurrentOffer = null;
+            return message.reply("someone already bought it!")
+        }
+        let answer = message.content.split(" ")[1].toLowerCase();
+        let amount = parseInt(message.content.split(" ")[2]);
+        if ((!answer) || (answer != "deny" && !amount)) return message.reply(".offer [confirm|deny] [amount]")
+        if (answer == "confirm") {
+            if (amount == Player.CurrentOffer.Price) {
+                Property.Buy(Player)
+                Player.RemoveMoney(message, Player.CurrentOffer.Price)
+                Player.CurrentOffer = null;
+                return message.reply(`you bought ${Property.Name} for $${Player.CurrentOffer.Price}`);
+            } else {
+                return message.reply(`the price is $${Player.CurrentOffer.Price}. Either .offer confirm ${Player.CurrentOffer.Price} or .offer deny`)
+            }
+        } else if (answer == "deny") {
+            Player.CurrentOffer = null;
+            return message.reply(`denied.`)
+        } else {
+            return message.reply(`.offer [confirm|deny] {amount}`)
+        }
     }
 }
 
@@ -854,6 +1031,13 @@ bot.on("message", async (message) => {
                     message.reply(`there is no game in this channel. Do ${prefix}create to make a game`)
                 } else {
                     bot.games.get(message.channel.id).Sell(message)
+                }
+                break;
+            case "offer":
+                if (!bot.games.has(message.channel.id)) {
+                    message.reply(`there is no game in this channel. Do ${prefix}create to make a game`)
+                } else {
+                    bot.games.get(message.channel.id).Offer(message)
                 }
                 break;
         }

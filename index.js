@@ -1,11 +1,13 @@
 const Discord = require("discord.js");
 const botconfig = require("./botconfig.json");
-const bot = new Discord.Client({ disableEveryone: true });
+const bot = new Discord.Client({
+    disableEveryone: true
+});
 const fs = require("fs")
 bot.games = new Discord.Collection();
 
 class Card {
-    constructor (Text, Money, Jail, MoveTo, CollectFromPlayers) {
+    constructor(Text, Money, Jail, MoveTo, CollectFromPlayers) {
         this.Text = Text;
         this.Money = Money;
         this.GetOutOfJail = Jail;
@@ -52,7 +54,7 @@ const ChanceCards = [
 class Property {
     constructor(Name, Rent, Color, Price, Mortgage, Building) {
         this.Name = Name;
-        this.Rent = Rent,
+        this.Rent = Rent;
         this.Color = Color;
         this.Price = Price;
         this.Mortgage = Mortgage;
@@ -80,17 +82,25 @@ class Player {
         this.Green = 0;
         this.DarkBlue = 0;
         this.GetOutOfJail = 0;
+        this.Doubles = false;
+        this.Rolled = false;
     }
 }
+
 class Game {
     constructor(message) {
+        this.HighestBid = 0;
+        this.Bidders = []
+        this.Bidding = false;
+        this.BiddersIndex = 0;
+
         this.InProgress = false;
         this.Leader = message.author.id;
         this.Players = new Discord.Collection();
         this.Players.set(message.author.id, new Player(message.author.id))
         this.CurrentPlayer = null;
         this.Properties = [
-            new Property("GO", -200, "GO"),
+            new Property("GO", 0, "GO"),
             new Property("Mediterranean Avenue (Brown)", [2, 10, 30, 90, 160, 250], "DARK_ORANGE", 60, 30, 50),
             new Property("Community Chest", 0, "Chest"),
             new Property("Baltic Avenue (Brown)", [4, 20, 60, 180, 320, 450], "DARK_ORANGE", 60, 30, 50),
@@ -161,7 +171,7 @@ class Game {
 
     Start(message) {
         if (message.author.id != this.Leader) return message.reply(`Only <@${this.Leader}> can start this game!`)
-        if (this.Players.size < 1) return message.reply("I can't start a game with less than 2 players")
+        if (this.Players.size < 2) return message.reply("I can't start a game with less than 2 players")
         this.InProgress = true;
         this.CurrentPlayerIndex = Math.floor(Math.random() * this.Players.size)
         this.CurrentPlayer = this.Players.array()[this.CurrentPlayerIndex]
@@ -171,22 +181,45 @@ class Game {
     Roll(message) {
         if (!this.InProgress) return message.reply("the game hasen't started yet!")
         if (message.author.id != this.CurrentPlayer.ID) return message.reply("it's not your turn!")
+        if (this.CurrentPlayer.Rolled) return message.reply("you already rolled")
+        this.CurrentPlayer.Rolled = true
         const Dice1 = Math.floor(Math.random() * 6) + 1;
         const Dice2 = Math.floor(Math.random() * 6) + 1;
         message.reply(`you rolled a ${Dice1} and a ${Dice2}`)
-        this.CurrentPlayer.Position += Dice1 + Dice2;
-        if (this.CurrentPlayer.Position >= this.Properties.length) {
-            this.CurrentPlayer.Money += 200;
-            this.CurrentPlayer.Position -= this.Properties.length;
+        if (this.CurrentPlayer.Jailed) {
+            if (Dice1 == Dice2) {
+                message.reply("You rolled doubles and got out of jail free!")
+                this.CurrentPlayer.Jailed = false;
+                this.CurrentPlayer.Position += Dice1 + Dice2;
+            } else {
+                if (this.CurrentPlayer.GetOutOfJail > 0) {
+                    this.CurrentPlayer.GetOutOfJail--;
+                    this.CurrentPlayer.Position += Dice1 + Dice2
+                    this.CurrentPlayer.Jailed = false;
+                    message.reply("Used one of your get out of jail free cards and got out of jail!")
+                } else {
+                    this.CurrentPlayer.Money -= 50;
+                    this.CurrentPlayer.Position += Dice1 + Dice2
+                    this.CurrentPlayer.Jailed = false;
+                    message.reply("Payed 50 dollars and got out of jail.")
+                }
+            }
+        } else {
+            this.CurrentPlayer.Position += Dice1 + Dice2;
+            if (this.CurrentPlayer.Position >= this.Properties.length) {
+                this.CurrentPlayer.Money += 200;
+                this.CurrentPlayer.Position -= this.Properties.length;
+            }
         }
+
 
         const CurrentProperty = this.Properties[this.CurrentPlayer.Position]
         const PropertyEmbed = new Discord.RichEmbed()
-        .setColor(CurrentProperty.Color)
-        .setTitle(CurrentProperty.Name)
-        .addField("Price", CurrentProperty.Price, true)
-        .addField("Mortgage", CurrentProperty.Mortgage, true)
-        .addField("Price per building", CurrentProperty.Building, true)
+            .setColor(CurrentProperty.Color)
+            .setTitle(CurrentProperty.Name)
+            .addField("Price", CurrentProperty.Price, true)
+            .addField("Mortgage", CurrentProperty.Mortgage, true)
+            .addField("Price per building", CurrentProperty.Building, true)
         if (typeof (CurrentProperty.Rent) != Number) {
             for (let i = 0; i < CurrentProperty.Rent.length; i++) {
                 if (i == 5) {
@@ -194,12 +227,10 @@ class Game {
                 } else {
                     if (CurrentProperty.Color == "RR") {
                         if (i != 0) PropertyEmbed.addField("Rent with " + i + ` ${(i == 1)?"RR":"RR's"}`, CurrentProperty.Rent[i], true)
-                    } else if (CurrentProperty.Color == "Utility") 
-                    {
+                    } else if (CurrentProperty.Color == "Utility") {
                         if (i != 0) PropertyEmbed.addField("Rent with " + i + ` ${(i == 1)?"Utility":"Utilities"}`, CurrentProperty.Rent[i] + " * dice roll", true)
 
-                    }
-                    else {
+                    } else {
                         PropertyEmbed.addField("Rent with " + i + ` ${(i == 1)?"House":"Houses"}`, CurrentProperty.Rent[i], true)
 
                     }
@@ -214,7 +245,7 @@ class Game {
                 var card = CommunityChestCards[Math.floor(Math.random() * CommunityChestCards.length)]
             } else if (CurrentProperty.Color == "Chance") {
                 var card = ChanceCards[Math.floor(Math.random() * ChanceCards.length)]
-            } 
+            }
             let Message = `you landed on a ${CurrentProperty.Color.toLowerCase()} card and it says "${card.Text}".`
             if (card.MoveTo == 10) {
                 this.CurrentPlayer.Position = 10
@@ -251,12 +282,12 @@ class Game {
             if (CurrentProperty.Owner) {
                 if (CurrentProperty.Owner.ID != this.CurrentPlayer.ID) {
                     this.CurrentPlayer.Money -= CurrentProperty.Rent[CurrentProperty.Owner.Utility]
-                    message.reply(`You landed on <@${CurrentProperty.Owner.ID}>'s ${CurrentProperty.Name} and paid him $${CurrentProperty.Rent[CurrentProperty.Owner.Utility]}. You now have ${this.CurrentPlayer.Money}`)    
+                    message.reply(`You landed on <@${CurrentProperty.Owner.ID}>'s ${CurrentProperty.Name} and paid him $${CurrentProperty.Rent[CurrentProperty.Owner.Utility]}. You now have ${this.CurrentPlayer.Money}`)
                 } else {
                     message.reply(`You landed on you own ${CurrentProperty.Name}.`)
                 }
             } else {
-                message.reply(`You landed on ${CurrentProperty.Name} and it costs $${CurrentProperty.Price}`)
+                message.reply(`You landed on ${CurrentProperty.Name} and it costs $${CurrentProperty.Price}. Do ${botconfig.prefixes[message.guild.id].prefix}buy to buy it!`)
             }
         } else if (CurrentProperty.Color == "Parking") {
             message.reply("You landed on free parking.")
@@ -268,24 +299,29 @@ class Game {
             if (CurrentProperty.Owner) {
                 if (CurrentProperty.Owner.ID == this.CurrentPlayer.ID) message.reply(`You landed on ${this.Properties[this.CurrentPlayer.Position].Name} but you already own it.`)
                 else {
-                    message.reply(`You landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>`)
-                    
+                    if (CurrentProperty.Mortgaged) {
+                        message.reply(`You landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}> but it is mortgaged...`)
+                    } else {
+                        message.reply(`You landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed him $${CurrentProperty.Rent[CurrentProperty.Houses]}!`)
+                        this.CurrentPlayer.Money -= CurrentProperty.Rent[CurrentProperty.Houses]
+                        CurrentProperty.Owner.Money += CurrentProperty.Rent[CurrentProperty.Houses]
+                    }
                 }
             } else {
                 if (CurrentProperty.Color == "RR") {
-                    message.reply(`You landed on ${CurrentProperty.Name} and it costs $${CurrentProperty.Price}.`)
+                    message.reply(`You landed on ${CurrentProperty.Name} and it costs $${CurrentProperty.Price}. Do ${botconfig.prefixes[message.guild.id].prefix}buy to buy it!`)
                 } else {
                     message.channel.send(PropertyEmbed)
+                    message.channel.send(`Do ${botconfig.prefixes[message.guild.id].prefix}buy to buy the property or do ${botconfig.prefixes[message.guild.id].prefix}end to end your turn`)
                 }
             }
         }
-        /*if (Dice1 == Dice2) message.reply("you rolled doubles so you get to go again!")
-        else {
-            this.CurrentPlayerIndex++;
-            if (this.CurrentPlayerIndex >= this.Players.size)this.CurrentPlayerIndex = 0;
-            this.CurrentPlayer = this.Players.array()[this.CurrentPlayerIndex]
-            message.channel.send(`<@${this.CurrentPlayer.ID}> it's your turn!`)
-        }*/
+        if (Dice1 == Dice2) {
+            message.reply("you rolled doubles so you get to go again!")
+            this.CurrentPlayer.Doubles = true;
+        } else {
+            this.CurrentPlayer.Doubles = false;
+        }
     }
 
     Stats(message) {
@@ -298,17 +334,152 @@ class Game {
         PlayerEmbed.addField("Money", player.Money, true)
         PlayerEmbed.addField("Get out of jail cards", player.GetOutOfJail, true)
         PlayerEmbed.addField("Currently Jailed?", player.Jailed, true)
-        .addField("Rail roads", player.RR, true)
-        .addField("Utilities", player.Utility, true)
-        .addField("Brown Properties", player.Brown, true)
-        .addField("Light blue properties", player.LightBlue, true)
-        .addField("Pink properties", player.Pink, true)
-        .addField("Orange Properties", player.Orange, true)
-        .addField("Red properties", player.Red, true)
-        .addField("Yellow properties", player.Yellow, true)
-        .addField("Green properties", player.Green, true)
-        .addField("Dark blue properties", player.DarkBlue, true)
+            .addField("Rail roads", player.RR, true)
+            .addField("Utilities", player.Utility, true)
+            .addField("Brown Properties", player.Brown, true)
+            .addField("Light blue properties", player.LightBlue, true)
+            .addField("Pink properties", player.Pink, true)
+            .addField("Orange Properties", player.Orange, true)
+            .addField("Red properties", player.Red, true)
+            .addField("Yellow properties", player.Yellow, true)
+            .addField("Green properties", player.Green, true)
+            .addField("Dark blue properties", player.DarkBlue, true)
         message.channel.send(PlayerEmbed)
+    }
+
+    Buy(message) {
+        if (!this.Players.has(message.author.id)) return message.reply("you aren't in this game.")
+        if (message.author.id != this.CurrentPlayer.ID) return message.reply("it's not your turn!")
+        const CurrentProperty = this.Properties[this.CurrentPlayer.Position]
+        if (!CurrentProperty.Price) return message.reply("you can't buy this!")
+        if (CurrentProperty.Price > this.CurrentPlayer.Money) return message.reply("you don't have enough money to buy this!")
+        CurrentProperty.Owner = this.CurrentPlayer;
+        this.CurrentPlayer.Money -= CurrentProperty.Price;
+        switch (CurrentProperty.Color) {
+            case "DARK_ORANGE":
+                this.CurrentPlayer.Brown++;
+                break;
+            case "BLUE":
+                this.CurrentPlayer.LightBlue++;
+                break;
+            case "LUMINOUS_VIVID_PINK":
+                this.CurrentPlayer.Pink++;
+                break;
+            case "Utility":
+                this.CurrentPlayer.Utility++;
+                break;
+            case "RR":
+                this.CurrentPlayer.RR++;
+                break;
+            case "ORANGE":
+                this.CurrentPlayer.Orange++;
+                break;
+            case "DARK_RED":
+                this.CurrentPlayer.Red++;
+                break;
+            case "GOLD":
+                this.CurrentPlayer.Yellow++;
+                break;
+            case "DARK_GREEN":
+                this.CurrentPlayer.Green++;
+                break;
+            case "DARK_BLUE":
+                this.CurrentPlayer.DarkBlue++;
+                break;
+        }
+        message.reply(`you bought ${CurrentProperty.Name}!`)
+    }
+
+    End(message) {
+        if (message.author.id != this.CurrentPlayer.ID) return message.reply('its not your turn')
+        if (!this.CurrentPlayer.Rolled) return message.reply("you haven't rolled yet")
+        if (!this.Properties[this.CurrentPlayer.Position].Owner) {
+            this.Bidding = true;
+            this.HighestBid = 0
+            this.Bidders = this.Players.concat().array()
+            this.BiddersIndex = 0;
+            message.channel.send(`Let the bidding begin! <@${this.Bidders[this.BiddersIndex].ID}> type !bid [amount] to place a bid or type !bid quit to back out.`)
+        } else {
+            this.CurrentPlayer.Rolled = false;
+            if (this.CurrentPlayer.Doubles) {
+                message.reply("roll again!")
+            } else {
+                this.CurrentPlayerIndex++;
+                if (this.CurrentPlayerIndex >= this.Players.size) this.CurrentPlayerIndex = 0;
+                this.CurrentPlayer = this.Players.array()[this.CurrentPlayerIndex]
+                message.channel.send(`<@${this.CurrentPlayer.ID}> it's your turn!`)
+            }
+        }
+    }
+
+    Auction(message) {
+        if (!this.Bidding) return message.reply("not currently bidding")
+        if (this.Bidders[this.BiddersIndex].ID != message.author.id) return message.reply(`the current bidder is ${Bidders[this.BiddersIndex].ID}!`)
+        let amount = message.content.split(" ")[1]
+        if (amount.toLowerCase() == "quit") {
+            this.Bidders.splice(this.BiddersIndex, 1)
+            message.reply("removed you from the bidders")
+            if (this.Bidders.length == 1) {
+                this.Bidding = false;
+                const winner = this.Players.get(this.Bidders[0].ID)
+                const CurrentProperty = this.Properties[this.CurrentPlayer.Position]
+                message.channel.send(`<@${winner.ID}> congrats you won ${this.Properties[this.CurrentPlayer.Position].Name} for $${this.HighestBid}`)
+                winner.Money -= this.HighestBid;
+                CurrentProperty.Owner = winner;
+                switch (CurrentProperty.Color) {
+                    case "DARK_ORANGE":
+                        winner.Brown++;
+                        break;
+                    case "BLUE":
+                        winner.LightBlue++;
+                        break;
+                    case "LUMINOUS_VIVID_PINK":
+                        winner.Pink++;
+                        break;
+                    case "Utility":
+                        winner.Utility++;
+                        break;
+                    case "RR":
+                        winner.RR++;
+                        break;
+                    case "ORANGE":
+                        winner.Orange++;
+                        break;
+                    case "DARK_RED":
+                        winner.Red++;
+                        break;
+                    case "GOLD":
+                        winner.Yellow++;
+                        break;
+                    case "DARK_GREEN":
+                        winner.Green++;
+                        break;
+                    case "DARK_BLUE":
+                        winner.DarkBlue++;
+                        break;
+                }
+                this.CurrentPlayer.Rolled = false;
+                if (this.CurrentPlayer.Doubles) {
+                    message.channel.send(`<@${this.CurrentPlayer.ID}> roll again!`)
+                } else {
+                    this.CurrentPlayerIndex++;
+                    if (this.CurrentPlayerIndex >= this.Players.size) this.CurrentPlayerIndex = 0;
+                    this.CurrentPlayer = this.Players.array()[this.CurrentPlayerIndex]
+                    message.channel.send(`<@${this.CurrentPlayer.ID}> it's your turn!`)
+                }
+            } else {
+                if (this.BiddersIndex >= this.Bidders.length) this.BiddersIndex = 0;
+                message.channel.send(`<@${this.Bidders[this.BiddersIndex].ID}> its your turn to bid!`)
+            }
+        } else {
+            amount = parseInt(amount)
+            if (!amount) return message.reply("you must specify an amount or say !bid quit")
+            if (amount <= this.HighestBid) return message.reply(`you must bid higher than $${this.HighestBid} or say !bid quit`)
+            this.HighestBid = amount;
+            this.BiddersIndex++;
+            if (this.BiddersIndex >= this.Bidders.length) this.BiddersIndex = 0;
+            message.channel.send(`<@${this.Bidders[this.BiddersIndex].ID}> its your turn to bid!`)
+        }
     }
 }
 
@@ -324,7 +495,9 @@ bot.on("message", async (message) => {
         return;
     }
 
-    if (!botconfig.prefixes[message.guild.id]) botconfig.prefixes[message.guild.id] = { "prefix": "!" }
+    if (!botconfig.prefixes[message.guild.id]) botconfig.prefixes[message.guild.id] = {
+        "prefix": "!"
+    }
     const prefix = botconfig.prefixes[message.guild.id].prefix;
 
     if (message.content.startsWith(prefix)) {
@@ -401,12 +574,28 @@ bot.on("message", async (message) => {
                 } else {
                     bot.games.get(message.channel.id).Stats(message)
                 }
+                break;
             case "buy":
-                    if (!bot.games.has(message.channel.id)) {
-                        message.reply(`there is no game in this channel. Do ${prefix}create to make a game`)
-                    } else {
-                        bot.games.get(message.channel.id).Stats(message)
-                    }
+                if (!bot.games.has(message.channel.id)) {
+                    message.reply(`there is no game in this channel. Do ${prefix}create to make a game`)
+                } else {
+                    bot.games.get(message.channel.id).Buy(message)
+                }
+                break;
+            case "end":
+                if (!bot.games.has(message.channel.id)) {
+                    message.reply(`there is no game in this channel. Do ${prefix}create to make a game`)
+                } else {
+                    bot.games.get(message.channel.id).End(message)
+                }
+                break;
+            case "bid":
+                if (!bot.games.has(message.channel.id)) {
+                    message.reply(`there is no game in this channel. Do ${prefix}create to make a game`)
+                } else {
+                    bot.games.get(message.channel.id).Auction(message)
+                }
+                break;
         }
     }
 })

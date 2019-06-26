@@ -127,7 +127,7 @@ class Player {
         }
     }
 
-    AddMoney(message, num) { //add money
+    AddMoney(num) { //add money
         this.Money += parseInt(num);
     }
 
@@ -135,10 +135,11 @@ class Player {
         return new Promise(async (resolve, reject) => {
             this.Position += spaces; //Move them num of spaces
             if (this.Position >= Properties.length) { //if they went around the board
-                this.AddMoney(message, 200); //add 200
+                this.AddMoney(200); //add 200
                 this.Position -= Properties.length; //move them back onto the board
                 await message.channel.send("you passed go!") //inform
             }
+            this.Position = 11;
             resolve();
         })
     }
@@ -195,7 +196,7 @@ class Game {
             /* 10 */
             new Property("Jail", 0, "Jail"),
             /* 11 */
-            new Property("Summoners Rift (Pink)", [10, 50, 150, 450, 625, 750], "LUMINOUS_VIVID_PINK", 140, 70, 100),
+            new Property("Summoners Rift (Pink)", [10, 50, 150, 450, 625, 750], "LUMINOUS_VIVID_PINK", 140, 70, 100, "https://cdn.discordapp.com/attachments/593554477844529152/593554996507967509/SummonersRift.png"),
             /* 12 */
             new Property("Electric Company", [0, 4, 10], "Utility", 150, 75, 0),
             /* 13 */
@@ -235,7 +236,7 @@ class Game {
             /* 30 */
             new Property("Go To Jail", 0, "Go To Jail"),
             /* 31 */
-            new Property("Green Hill Zone (Green)", [26, 130, 390, 900, 1100, 1275], "DARK_GREEN", 300, 150, 200),
+            new Property("Green Hill Zone (Green)", [26, 130, 390, 900, 1100, 1275], "DARK_GREEN", 300, 150, 200, "https://cdn.discordapp.com/attachments/593554477844529152/593555582238064650/GreenHillZone.png"),
             /* 32 */
             new Property("North Carolina Avenue (Green)", [26, 130, 390, 900, 1100, 1275], "DARK_GREEN", 300, 150, 200),
             /* 33 */
@@ -251,7 +252,7 @@ class Game {
             /* 38 */
             new Property("Nitro Boost - Pay $100", 100, "Tax"),
             /* 39 */
-            new Property("Final Destination (Dark Blue)", [50, 200, 600, 1400, 1700, 2000], "DARK_BLUE", 400, 200, 200)
+            new Property("Final Destination (Dark Blue)", [50, 200, 600, 1400, 1700, 2000], "DARK_BLUE", 400, 200, 200, "https://cdn.discordapp.com/attachments/593554477844529152/593555747443441684/FinalDestination.png")
         ]
 
         message.channel.send(`Welcome to Discord Monopoly! Get your friends to type ${botconfig.prefixes[message.guild.id].prefix}join to join the game`).then(async msg => await msg.react("🖐"));
@@ -340,7 +341,7 @@ class Game {
                     await message.channel.send(Message).then(async msg => await msg.react("🛑")) //send message
                 } else if (card.MoveTo != null) { //if there is a move to
                     if (card.MoveTo < this.CurrentPlayer.Position) { //if its behind the player
-                        this.CurrentPlayer.AddMoney(message, 200) //add 200
+                        this.CurrentPlayer.AddMoney(200) //add 200
                         Message += ` You passed go and collected $200!` //Passed go
                     }
                     this.CurrentPlayer.Position = card.MoveTo //Move
@@ -352,11 +353,11 @@ class Game {
                         Message += ` You lost $${(this.Players.size - 1) * card.Money * -1}!`
                         this.Players.array().forEach(player => { //loop through each player
                             if (player.ID != this.CurrentPlayer.ID) { //if the player isn't the current player
-                                player.AddMoney(message, card.Money * -1) //add money
+                                player.AddMoney(card.Money * -1) //add money
                             }
                         });
                     } else { //If money is 0 or above
-                        this.CurrentPlayer.AddMoney(message, (this.Players.size - 1) * card.Money) //Add money
+                        this.CurrentPlayer.AddMoney((this.Players.size - 1) * card.Money) //Add money
                         Message += ` You collected $${(this.Players.size - 1) * card.Money}!`
                         this.Players.array().forEach(player => { //Loop through each player
                             if (player.ID != this.CurrentPlayer.ID) { //If the player isn't the current one
@@ -369,7 +370,7 @@ class Game {
                     if (card.Money < 0) { //if its below 0
                         this.CurrentPlayer.RemoveMoney(message, card.Money * -1, null) //Remove the money
                     } else { //if its 0 or above
-                        this.CurrentPlayer.AddMoney(message, card.Money) //Add money
+                        this.CurrentPlayer.AddMoney(card.Money) //Add money
                     }
                     await message.channel.send(Message).then(async msg => await msg.react("🛑")) //send message
                 }
@@ -392,7 +393,7 @@ class Game {
                         } else { //if its not mortgaged
                             const Price = (Dice1 + Dice2) * CurrentProperty.Rent[CurrentProperty.Owner.Utility] //price is dice roll * rent
                             this.CurrentPlayer.RemoveMoney(message, Price, CurrentProperty.Owner) //remove amount
-                            CurrentProperty.Owner.AddMoney(message, Price) //add to owner
+                            CurrentProperty.Owner.AddMoney(Price) //add to owner
                             await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2}. You landed on <@${CurrentProperty.Owner.ID}>'s ${CurrentProperty.Name} and paid them $${Price}.`).then(async msg => await msg.react("🛑"))
                         }
                     } else { //if you land on your own utility
@@ -416,7 +417,7 @@ class Game {
                     } else { //not mortgaged
                         if (CurrentProperty.Owner.ID != this.CurrentPlayer.ID) { //if its not owned by you
                             this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Owner.RR], CurrentProperty.Owner) //remove money
-                            CurrentProperty.Owner.AddMoney(message, CurrentProperty.Rent[CurrentProperty.Owner.RR]) //add money to owner
+                            CurrentProperty.Owner.AddMoney(CurrentProperty.Rent[CurrentProperty.Owner.RR]) //add money to owner
                             await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on <@${CurrentProperty.Owner.ID}>'s ${CurrentProperty.Name} and payed them $${CurrentProperty.Rent[CurrentProperty.Owner.RR]}`).then(async msg => await msg.react("🛑"))
                         } else { //if its owned by you
                             await message.channel.send(`<@${userID}> you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name} but you already own it!`).then(async msg => await msg.react("🛑"))
@@ -438,26 +439,26 @@ class Game {
                             if (CurrentProperty.Houses > 0) { //more than 0 house
                                 await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed him $${CurrentProperty.Rent[CurrentProperty.Houses]}!`).then(async msg => await msg.react("🛑"))
                                 this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses], CurrentProperty.Owner) //remove money
-                                CurrentProperty.Owner.AddMoney(message, CurrentProperty.Rent[CurrentProperty.Houses]) //add money
+                                CurrentProperty.Owner.AddMoney(CurrentProperty.Rent[CurrentProperty.Houses]) //add money
                             } else { //0 houses
                                 if (CurrentProperty.Color == "DARK_ORANGE" || CurrentProperty.Color == "DARK_BLUE") { //if its orange or blue
                                     if (CurrentProperty.Owner[CurrentProperty.Color] < 2) { //doesn't own all 2
                                         this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses], CurrentProperty.Owner)
-                                        CurrentProperty.Owner.AddMoney(message, CurrentProperty.Rent[CurrentProperty.Houses])
+                                        CurrentProperty.Owner.AddMoney(CurrentProperty.Rent[CurrentProperty.Houses])
                                         await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed him $${CurrentProperty.Rent[CurrentProperty.Houses]}!`).then(async msg => await msg.react("🛑"))
                                     } else { //owns all 2
                                         this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2, CurrentProperty.Owner) //multiply rent by 2
-                                        CurrentProperty.Owner.AddMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2)
+                                        CurrentProperty.Owner.AddMoney(CurrentProperty.Rent[CurrentProperty.Houses] * 2)
                                         await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed him $${CurrentProperty.Rent[CurrentProperty.Houses] * 2}!`).then(async msg => await msg.react("🛑"))
                                     }
                                 } else { //any other color
                                     if (CurrentProperty.Owner[CurrentProperty.Color] < 3) { //doesn't own all 3
                                         this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses], CurrentProperty.Owner)
-                                        CurrentProperty.Owner.AddMoney(message, CurrentProperty.Rent[CurrentProperty.Houses])
+                                        CurrentProperty.Owner.AddMoney(CurrentProperty.Rent[CurrentProperty.Houses])
                                         await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed him $${CurrentProperty.Rent[CurrentProperty.Houses]}!`).then(async msg => await msg.react("🛑"))
                                     } else { //does own all 3
                                         this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2, CurrentProperty.Owner) //multiply rent by 2
-                                        CurrentProperty.Owner.AddMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2)
+                                        CurrentProperty.Owner.AddMoney(CurrentProperty.Rent[CurrentProperty.Houses] * 2)
                                         await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed him $${CurrentProperty.Rent[CurrentProperty.Houses] * 2}!`).then(async msg => await msg.react("🛑"))
                                     }
                                 }
@@ -605,7 +606,7 @@ class Game {
                     }
                 }
                 if (MoneyForNewPlayer > 0) { //if the money for the new player is more than 0
-                    Player.PaidPlayer.AddMoney(message, MoneyForNewPlayer) //pay the player
+                    Player.PaidPlayer.AddMoney(MoneyForNewPlayer) //pay the player
                 }
             } else { //no paid player
                 this.CurrentPlayerIndex--; //go back to previous player (so that when we increase it again it goes to the real next player and doesn't skip)
@@ -770,7 +771,7 @@ class Game {
         }
         if (!FoundHouseIndex) return await message.channel.send("couldn't find that property") //if haven't found a house
         if (this.Properties[FoundHouseIndex].Houses > 0) { //if theres more than one house on it
-            this.CurrentPlayer.AddMoney(message, Math.round(this.Properties[FoundHouseIndex].Building / 2)); //sell the house for half the house cost
+            this.CurrentPlayer.AddMoney(Math.round(this.Properties[FoundHouseIndex].Building / 2)); //sell the house for half the house cost
             this.Properties[FoundHouseIndex].Houses--; //remove house
             await message.channel.send(`you sold 1 house for $${Math.round(this.Properties[FoundHouseIndex].Building / 2)} and now have ${this.Properties[FoundHouseIndex].Houses} ${(this.Properties[FoundHouseIndex].Houses == 1)?"house":"houses"} on it!`).then(async msg => await msg.react("🛑"))
         } else { //no houses
@@ -872,7 +873,7 @@ class Game {
             if (amount == Player.CurrentOffer.Price) { //if the amount is the same as the offered price
                 Property.Buy(Player) //buy
                 Player.RemoveMoney(message, Player.CurrentOffer.Price, this.Players.get(Player.CurrentOffer.OriginalOwner.ID)) //remove money
-                this.Players.get(Player.CurrentOffer.OriginalOwner.ID).AddMoney(message, Player.CurrentOffer.Price) //add money
+                this.Players.get(Player.CurrentOffer.OriginalOwner.ID).AddMoney(Player.CurrentOffer.Price) //add money
                 await message.channel.send(`you bought ${Property.Name} for $${Player.CurrentOffer.Price}`);
                 Player.CurrentOffer = null; //remove offer
                 return;
@@ -990,7 +991,7 @@ class Game {
         }
 
         FoundHouse.Mortgaged = true; //mortgage
-        FoundHouse.Owner.AddMoney(message, FoundHouse.Mortgage) //add money
+        FoundHouse.Owner.AddMoney(FoundHouse.Mortgage) //add money
         await message.channel.send(`you mortgaged ${FoundHouse.Name} for $${FoundHouse.Mortgage}`).then(async msg => await msg.react("🛑"))
     }
 
@@ -1057,6 +1058,7 @@ bot.on("ready", async () => {
 
 bot.on("message", async (message) => {
     if (message.author.bot) return; //if from a bot
+    if (message.channel.type == "dm") return;
     if (message.content == "shutdown" && message.author.id == "330000865215643658") { //if it says shutdown and from owner
         await bot.destroy()
         return;

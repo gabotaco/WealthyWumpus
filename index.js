@@ -176,17 +176,17 @@ class Game {
             /* 0 */
             new Property("GO", 0, "GO"),
             /* 1 */
-            new Property("Loot Lake (Brown)", [2, 10, 30, 90, 160, 250], "DARK_ORANGE", 60, 30, 50),
+            new Property("Loot Lake (Brown)", [2, 10, 30, 90, 160, 250], "DARK_ORANGE", 60, 30, 50, "https://cdn.discordapp.com/attachments/593554477844529152/593566340141285376/LootLake.png"),
             /* 2 */
             new Property("Community Chest", 0, "Chest"),
             /* 3 */
-            new Property("Russian Metro (Brown)", [4, 20, 60, 180, 320, 450], "DARK_ORANGE", 60, 30, 50),
+            new Property("Desert Temple (Brown)", [4, 20, 60, 180, 320, 450], "DARK_ORANGE", 60, 30, 50, "https://cdn.discordapp.com/attachments/593554477844529152/593566426087030784/DesertTemple.png"),
             /* 4 */
             new Property("Nitro Monthly Subscription - Pay $200", 200, "Tax"),
             /* 5 */
-            new Property("Reading Railroad", [0, 25, 50, 100, 200], "RR", 200, 100, 0),
+            new Property("Wumpus’ Wonderful Rail", [0, 25, 50, 100, 200], "RR", 200, 100, 0),
             /* 6 */
-            new Property("Desert Temple (Light Blue)", [6, 30, 90, 270, 400, 550], "BLUE", 100, 50, 50),
+            new Property("Russian Metro (Light Blue)", [6, 30, 90, 270, 400, 550], "BLUE", 100, 50, 50, "https://cdn.discordapp.com/attachments/593554477844529152/593566543384936448/RussianMetro.png"),
             /* 7 */
             new Property("Chance", 0, "Chance"),
             /* 8 */
@@ -196,17 +196,17 @@ class Game {
             /* 10 */
             new Property("Jail", 0, "Jail"),
             /* 11 */
-            new Property("Summoners Rift (Pink)", [10, 50, 150, 450, 625, 750], "LUMINOUS_VIVID_PINK", 140, 70, 100, "https://cdn.discordapp.com/attachments/593554477844529152/593554996507967509/SummonersRift.png"),
+            new Property("Summoners Rift (Pink)", [10, 50, 150, 450, 625, 750], "LUMINOUS_VIVID_PINK", 140, 70, 100, "https://cdn.discordapp.com/attachments/593554477844529152/593566969811435551/SummonersRift.png"),
             /* 12 */
-            new Property("Electric Company", [0, 4, 10], "Utility", 150, 75, 0),
+            new Property("Server Room", [0, 4, 10], "Utility", 150, 75, 0),
             /* 13 */
-            new Property("Nuketown (Pink)", [10, 50, 150, 450, 625, 750], "LUMINOUS_VIVID_PINK", 140, 70, 100),
+            new Property("Peaches Castle (Pink)", [10, 50, 150, 450, 625, 750], "LUMINOUS_VIVID_PINK", 140, 70, 100),
             /* 14 */
-            new Property("Monkey Island (Pink)", [12, 60, 180, 500, 700, 900], "LUMINOUS_VIVID_PINK", 160, 80, 100),
+            new Property("Virginia Avenue (Pink)", [12, 60, 180, 500, 700, 900], "LUMINOUS_VIVID_PINK", 160, 80, 100),
             /* 15 */
-            new Property("Pennsylvania Railroad", [0, 25, 50, 100, 200], "RR", 200, 100, 0),
+            new Property("Hypesquad Bravery", [0, 25, 50, 100, 200], "RR", 200, 100, 0),
             /* 16 */
-            new Property("Peaches Castle (Orange)", [14, 70, 200, 550, 750, 950], "ORANGE", 180, 90, 100),
+            new Property("Rockport (Orange)", [14, 70, 200, 550, 750, 950], "ORANGE", 180, 90, 100),
             /* 17 */
             new Property("Community Chest", 0, "Chest"),
             /* 18 */
@@ -224,7 +224,7 @@ class Game {
             /* 24 */
             new Property("Illinois Avenue (Red)", [20, 100, 300, 750, 925, 1100], "DARK_RED", 240, 120, 150),
             /* 25 */
-            new Property("B. & O. Railroad", [0, 25, 50, 100, 200], "RR", 200, 100, 0),
+            new Property("Hypesquad Brilliance", [0, 25, 50, 100, 200], "RR", 200, 100, 0),
             /* 26 */
             new Property("Atlantic Avenue (Yellow)", [22, 110, 330, 800, 975, 1150], "GOLD", 260, 130, 150),
             /* 27 */
@@ -232,27 +232,27 @@ class Game {
             /* 28 */
             new Property("Water Works", [0, 4, 10], "Utility", 150, 75, 0),
             /* 29 */
-            new Property("Marvin Gardens (Yellow)", [24, 120, 360, 850, 1025, 1200], "GOLD", 280, 140, 150),
+            new Property("Nuketown (Yellow)", [24, 120, 360, 850, 1025, 1200], "GOLD", 280, 140, 150),
             /* 30 */
             new Property("Go To Jail", 0, "Go To Jail"),
             /* 31 */
-            new Property("Green Hill Zone (Green)", [26, 130, 390, 900, 1100, 1275], "DARK_GREEN", 300, 150, 200, "https://cdn.discordapp.com/attachments/593554477844529152/593555582238064650/GreenHillZone.png"),
+            new Property("Green Hill Zone (Green)", [26, 130, 390, 900, 1100, 1275], "DARK_GREEN", 300, 150, 200, "https://cdn.discordapp.com/attachments/593554477844529152/593566845823352851/GreenHillZone.png"),
             /* 32 */
-            new Property("North Carolina Avenue (Green)", [26, 130, 390, 900, 1100, 1275], "DARK_GREEN", 300, 150, 200),
+            new Property("Monkey Island (Green)", [26, 130, 390, 900, 1100, 1275], "DARK_GREEN", 300, 150, 200),
             /* 33 */
             new Property("Community Chest", 0, "Chest"),
             /* 34 */
             new Property("Pennsylvania Avenue (Green)", [28, 150, 450, 1000, 1200, 1400], "DARK_GREEN", 320, 160, 200),
             /* 35 */
-            new Property("Short Line", [0, 25, 50, 100, 200], "RR", 200, 100, 0),
+            new Property("Hypesquad Balance", [0, 25, 50, 100, 200], "RR", 200, 100, 0),
             /* 36 */
             new Property("Chance", 0, "Chance"),
             /* 37 */
-            new Property("Park Place (Dark Blue)", [35, 175, 500, 1100, 1300, 1500], "DARK_BLUE", 350, 175, 200),
+            new Property("The End (Dark Blue)", [35, 175, 500, 1100, 1300, 1500], "DARK_BLUE", 350, 175, 200),
             /* 38 */
             new Property("Nitro Boost - Pay $100", 100, "Tax"),
             /* 39 */
-            new Property("Final Destination (Dark Blue)", [50, 200, 600, 1400, 1700, 2000], "DARK_BLUE", 400, 200, 200, "https://cdn.discordapp.com/attachments/593554477844529152/593555747443441684/FinalDestination.png")
+            new Property("Final Destination (Dark Blue)", [50, 200, 600, 1400, 1700, 2000], "DARK_BLUE", 400, 200, 200, "https://cdn.discordapp.com/attachments/593554477844529152/593566737585274920/FinalDestination.png")
         ]
 
         message.channel.send(`Welcome to Discord Monopoly! Get your friends to type ${botconfig.prefixes[message.guild.id].prefix}join to join the game`).then(async msg => await msg.react("🖐"));

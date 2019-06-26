@@ -18,41 +18,21 @@ class Card {
 }
 
 const CommunityChestCards = [ //Community chest cards
-    new Card("Advance to \"Go\"", 200, false, 0),
-    new Card("Bank error in your favor. Collect $200", 200, false, null),
-    new Card("Doctor's fees. Pay $50", -50, false, null),
-    new Card("From sale of stock you get $50", 50, false, null),
-    new Card("Get Out of Jail Free", 0, true, null),
-    new Card("Go to Jail. Go directly to jail. Do not pass Go, Do not collect $200", 0, false, 10),
-    new Card("Grand Opera Night. Collect $50 from every player for opening night seats.", 50, false, null, true),
-    new Card("Holiday Fund matures. Receive $100.", 100, false, null, false),
-    new Card("Income tax refund. Collect $20", 20, false, null, false),
-    new Card("It is your birthday. Collect $10 from every player.", 10, false, null, true),
-    new Card("Life insurance matures - Collect $100", 100, false, null, false),
-    new Card("Hospital Fees. Pay $50.", -50, false, null, false),
-    new Card("School fees. Pay $50.", -50, false, null, false),
-    new Card("Receive $25 consultancy fee.", 25, false, null, false),
-    new Card("You have won second prize in a beauty contest. Collect $10.", 10, false, null, false),
-    new Card("You inherit $100.", 100, false, null, false)
+    new Card("Get out of jail free", 0, true, null, false),
+    new Card("Advance to Go", 0, false, 0, false),
+    new Card("Go to jail. Do not pass Go, do not collect $200", 0, false, 10, false),
+    new Card("You got a lucky loot crate! Collect $50 from every other player", 50, false, null, true)
 ]
 
 const ChanceCards = [ //chance cards
-    new Card("Advance to \"Go\"", 200, false, 0, false),
-    new Card("Advance to Illinois Ave. If you pass Go, collect $200", 0, false, 24, false),
-    new Card("Advance to St. Charles Place. If you pass Go, collect $200", 0, false, 16, false),
-    new Card("Bank pays you dividend of $50.", 50, false, null, false),
-    new Card("Get out of Jail Free", 0, true, null, false),
-    new Card("Go to Jail. Go directly to Jail", 0, false, 10, false),
-    new Card("Pay poor tax of $15", -15, false, null, false),
-    new Card("Take a trip to Reading Railroad", 0, false, 5, false),
-    new Card("Take a walk on Board walk", 0, false, 39, false),
-    new Card("You have been elected Chairman of the Board. Pay each player $50", -50, false, null, true),
-    new Card("Your building loan matures. Receive $150.", 150, false, null, false),
-    new Card("You have won a crossword competition. Collect $100", 100, false, null, false)
+    new Card("You got a victory royale as John Wick! Collect $150", 150, false, null, false),
+    new Card("Go to jail. Do not pass Go, do not collect $200", 0, false, 10, false),
+    new Card("Get out of jail free", 0, true, null, false),
+    new Card("Advance to Summoner’s Rift. If you pass Go, collect $200", 0, false, 11, false)
 ]
 
 class Property { //Make a property
-    constructor(Name, Rent, Color, Price, Mortgage, Building) {
+    constructor(Name, Rent, Color, Price, Mortgage, Building, Image) {
         this.Name = Name; //Name of the property
         this.Rent = Rent; //Array of prices based on how many houses they have [no house rent, 1 house rent, 2 house rent...]
         this.Color = Color; //The color of it (discord color or type)
@@ -62,6 +42,7 @@ class Property { //Make a property
         this.Mortgaged = false; //if its mortgaged
         this.Owner = null; //who ownes it
         this.Houses = 0; //How many houses are on it
+        this.Image = Image
     }
 
     Buy(NewOwner) { //Buy the property (doesn't charge)
@@ -82,8 +63,9 @@ class Property { //Make a property
             PropertyEmbed.addField("Price per building", this.Building, true)
         } else {
             PropertyEmbed.setColor("RANDOM")
-
         }
+
+        if (this.Image) PropertyEmbed.setImage(this.Image)
         if (typeof (this.Rent) != Number) { //If the rent is an array and not a Number (0)
             for (let i = 0; i < this.Rent.length; i++) { //go through all the rent
                 if (i == 5) { //if theres 5 then its a property with hotels
@@ -137,7 +119,7 @@ class Player {
         this.PaidPlayer = null; //Last player they paid
     }
 
-    RemoveMoney(message, num, OtherPlayer) { //remove money
+    async RemoveMoney(message, num, OtherPlayer) { //remove money
         this.Money -= parseInt(num) //remove
         if (this.Money < 0) { //if they are bankrupt
             await message.channel.send(`<@${this.ID}> you are in debt!! If you are still in debt when you end your turn you will lose!`) //notify
@@ -150,12 +132,15 @@ class Player {
     }
 
     Move(message, spaces, Properties) { //Move them
-        this.Position += spaces; //Move them num of spaces
-        if (this.Position >= Properties.length) { //if they went around the board
-            await this.AddMoney(message, 200); //add 200
-            this.Position -= Properties.length; //move them back onto the board
-            await message.channel.send("you passed go!") //inform
-        }
+        return new Promise(async (resolve, reject) => {
+            this.Position += spaces; //Move them num of spaces
+            if (this.Position >= Properties.length) { //if they went around the board
+                this.AddMoney(message, 200); //add 200
+                this.Position -= Properties.length; //move them back onto the board
+                await message.channel.send("you passed go!") //inform
+            }
+            resolve();
+        })
     }
 
     Free() {
@@ -171,7 +156,7 @@ class Player {
 }
 
 class Game {
-    async constructor(message) {
+    constructor(message) {
         this.HighestBid = 0; //Current highest bid
         this.Bidders = [] //Who is bidding
         this.Bidding = false; //if we are bidding
@@ -190,43 +175,43 @@ class Game {
             /* 0 */
             new Property("GO", 0, "GO"),
             /* 1 */
-            new Property("Mediterranean Avenue (Brown)", [2, 10, 30, 90, 160, 250], "DARK_ORANGE", 60, 30, 50),
+            new Property("Loot Lake (Brown)", [2, 10, 30, 90, 160, 250], "DARK_ORANGE", 60, 30, 50),
             /* 2 */
             new Property("Community Chest", 0, "Chest"),
             /* 3 */
-            new Property("Baltic Avenue (Brown)", [4, 20, 60, 180, 320, 450], "DARK_ORANGE", 60, 30, 50),
+            new Property("Russian Metro (Brown)", [4, 20, 60, 180, 320, 450], "DARK_ORANGE", 60, 30, 50),
             /* 4 */
-            new Property("Income Tax", 200, "Tax"),
+            new Property("Nitro Monthly Subscription - Pay $200", 200, "Tax"),
             /* 5 */
             new Property("Reading Railroad", [0, 25, 50, 100, 200], "RR", 200, 100, 0),
             /* 6 */
-            new Property("Oriental Avenue (Light Blue)", [6, 30, 90, 270, 400, 550], "BLUE", 100, 50, 50),
+            new Property("Desert Temple (Light Blue)", [6, 30, 90, 270, 400, 550], "BLUE", 100, 50, 50),
             /* 7 */
             new Property("Chance", 0, "Chance"),
             /* 8 */
-            new Property("Vermont Avenue (Light Blue)", [6, 30, 90, 270, 400, 550], "BLUE", 100, 50, 50),
+            new Property("Rapture (Light Blue)", [6, 30, 90, 270, 400, 550], "BLUE", 100, 50, 50),
             /* 9 */
-            new Property("Connecticut Avenue (Light Blue)", [8, 40, 100, 300, 450, 600], "BLUE", 120, 60, 50),
+            new Property("Hoth (Light Blue)", [8, 40, 100, 300, 450, 600], "BLUE", 120, 60, 50),
             /* 10 */
             new Property("Jail", 0, "Jail"),
             /* 11 */
-            new Property("St. Charles Place (Pink)", [10, 50, 150, 450, 625, 750], "LUMINOUS_VIVID_PINK", 140, 70, 100),
+            new Property("Summoners Rift (Pink)", [10, 50, 150, 450, 625, 750], "LUMINOUS_VIVID_PINK", 140, 70, 100),
             /* 12 */
             new Property("Electric Company", [0, 4, 10], "Utility", 150, 75, 0),
             /* 13 */
-            new Property("States Avenue (Pink)", [10, 50, 150, 450, 625, 750], "LUMINOUS_VIVID_PINK", 140, 70, 100),
+            new Property("Nuketown (Pink)", [10, 50, 150, 450, 625, 750], "LUMINOUS_VIVID_PINK", 140, 70, 100),
             /* 14 */
-            new Property("Virginia Avenue (Pink)", [12, 60, 180, 500, 700, 900], "LUMINOUS_VIVID_PINK", 160, 80, 100),
+            new Property("Monkey Island (Pink)", [12, 60, 180, 500, 700, 900], "LUMINOUS_VIVID_PINK", 160, 80, 100),
             /* 15 */
             new Property("Pennsylvania Railroad", [0, 25, 50, 100, 200], "RR", 200, 100, 0),
             /* 16 */
-            new Property("St. James Place (Orange)", [14, 70, 200, 550, 750, 950], "ORANGE", 180, 90, 100),
+            new Property("Peaches Castle (Orange)", [14, 70, 200, 550, 750, 950], "ORANGE", 180, 90, 100),
             /* 17 */
             new Property("Community Chest", 0, "Chest"),
             /* 18 */
-            new Property("Tennessee Avenue (Orange)", [14, 70, 200, 550, 750, 950], "ORANGE", 180, 90, 100),
+            new Property("San Andreas (Orange)", [14, 70, 200, 550, 750, 950], "ORANGE", 180, 90, 100),
             /* 19 */
-            new Property("New York Avenue (Orange)", [16, 80, 220, 600, 800, 1000], "ORANGE", 200, 100, 100),
+            new Property("Dust 2 (Orange)", [16, 80, 220, 600, 800, 1000], "ORANGE", 200, 100, 100),
             /* 20 */
             new Property("Free Parking", 0, "Parking"),
             /* 21 */
@@ -250,7 +235,7 @@ class Game {
             /* 30 */
             new Property("Go To Jail", 0, "Go To Jail"),
             /* 31 */
-            new Property("Pacific Avenue (Green)", [26, 130, 390, 900, 1100, 1275], "DARK_GREEN", 300, 150, 200),
+            new Property("Green Hill Zone (Green)", [26, 130, 390, 900, 1100, 1275], "DARK_GREEN", 300, 150, 200),
             /* 32 */
             new Property("North Carolina Avenue (Green)", [26, 130, 390, 900, 1100, 1275], "DARK_GREEN", 300, 150, 200),
             /* 33 */
@@ -264,12 +249,12 @@ class Game {
             /* 37 */
             new Property("Park Place (Dark Blue)", [35, 175, 500, 1100, 1300, 1500], "DARK_BLUE", 350, 175, 200),
             /* 38 */
-            new Property("Luxury Tax", 100, "Tax"),
+            new Property("Nitro Boost - Pay $100", 100, "Tax"),
             /* 39 */
-            new Property("Boardwalk (Dark Blue)", [50, 200, 600, 1400, 1700, 2000], "DARK_BLUE", 400, 200, 200)
+            new Property("Final Destination (Dark Blue)", [50, 200, 600, 1400, 1700, 2000], "DARK_BLUE", 400, 200, 200)
         ]
 
-        await message.channel.send(`Welcome to Discord Monopoly! Get your friends to type ${botconfig.prefixes[message.guild.id].prefix}join to join the game`).then(async msg => await msg.react("🖐"));
+        message.channel.send(`Welcome to Discord Monopoly! Get your friends to type ${botconfig.prefixes[message.guild.id].prefix}join to join the game`).then(async msg => await msg.react("🖐"));
     }
 
     async NewPlayer(message, user) { //new player
@@ -331,14 +316,12 @@ class Game {
         this.CurrentPlayerIndex = Math.floor(Math.random() * this.Players.size) //pick random starting player
         this.CurrentPlayer = this.Players.array()[this.CurrentPlayerIndex] //set currentplayer
 
-        await message.channel.send(`Lets get the show on the road! <@${this.CurrentPlayer.ID}>, you are going first! Do ${botconfig.prefixes[message.guild.id].prefix}roll to roll!`).then(async msg => await msg.react("🎲")) //inform
+        await message.channel.send(`Lets get the show on the road! <@${this.CurrentPlayer.ID}>, you are going first! Do ${botconfig.prefixes[message.guild.id].prefix}roll to roll!`).then(async msg => {await msg.react("🎲"); await msg.react("🏠")}) //inform
     }
 
     async HandlePosition(message, userID, Dice1, Dice2) { //handle them being in a position
         return new Promise(async (resolve, reject) => {
             const CurrentProperty = this.Properties[this.CurrentPlayer.Position] //Get current property
-            const PropertyEmbed = CurrentProperty.Info(); //Get info
-
             if (CurrentProperty.Color == "GO") { //Currently on GO
                 await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on go and collected $200.`).then(async msg => await msg.react("🛑")) //inform
             } else if (CurrentProperty.Color == "Chest" || CurrentProperty.Color == "Chance") { //Currently on Chest or Chance
@@ -351,14 +334,17 @@ class Game {
                 let Message = `<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on a ${CurrentProperty.Color.toLowerCase()} card and it says "${card.Text}".` //Inform about card
                 if (card.MoveTo == 10) { //if move to jail
                     this.CurrentPlayer.Jail();
+                    await message.channel.send(Message).then(async msg => await msg.react("🛑")) //send message
                 } else if (card.GetOutOfJail) { //if its get out of jail
                     this.CurrentPlayer.GetOutOfJail++; //increase get out of jail
+                    await message.channel.send(Message).then(async msg => await msg.react("🛑")) //send message
                 } else if (card.MoveTo != null) { //if there is a move to
                     if (card.MoveTo < this.CurrentPlayer.Position) { //if its behind the player
                         this.CurrentPlayer.AddMoney(message, 200) //add 200
                         Message += ` You passed go and collected $200!` //Passed go
                     }
                     this.CurrentPlayer.Position = card.MoveTo //Move
+                    await message.channel.send(Message).then(async msg => await msg.react("🛑")) //send message
                     await this.HandlePosition(message, userID, Dice1, Dice2)
                 } else if (card.CollectFromPlayers) { //If you collect money from others
                     if (card.Money < 0) { //if money is below 0
@@ -378,14 +364,15 @@ class Game {
                             }
                         });
                     }
+                    await message.channel.send(Message).then(async msg => await msg.react("🛑")) //send message
                 } else { //if the card is just money
                     if (card.Money < 0) { //if its below 0
                         this.CurrentPlayer.RemoveMoney(message, card.Money * -1, null) //Remove the money
                     } else { //if its 0 or above
                         this.CurrentPlayer.AddMoney(message, card.Money) //Add money
                     }
+                    await message.channel.send(Message).then(async msg => await msg.react("🛑")) //send message
                 }
-                await message.channel.send(Message).then(async msg => await msg.react("🛑")) //send message
             } else if (CurrentProperty.Color == "Tax") { //if they landed on tax
                 const TenPercent = Math.round((this.CurrentPlayer.Money + this.CurrentPlayer.Worth) * 0.1) //get 10 percent of total worth
                 if (TenPercent < CurrentProperty.Rent) { //If ten percent is less than the tax
@@ -478,13 +465,13 @@ class Game {
                         }
                     }
                 } else { //nobody owns it
-                    await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name}. Do ${botconfig.prefixes[message.guild.id].prefix}buy to buy the property or do ${botconfig.prefixes[message.guild.id].prefix}end to auction it! You currently have $${this.CurrentPlayer.Money}`, PropertyEmbed).then(async msg => {
+                    await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name}. Do ${botconfig.prefixes[message.guild.id].prefix}buy to buy the property or do ${botconfig.prefixes[message.guild.id].prefix}end to auction it! You currently have $${this.CurrentPlayer.Money}`, CurrentProperty.Info()).then(async msg => {
                         await msg.react("✅");
                         await msg.react("🛑");
                     })
                 }
             }
-
+            resolve();
         })
     }
 
@@ -511,19 +498,19 @@ class Game {
             if (Dice1 == Dice2) { //If they rolled doubles
                 await message.channel.send(`<@${userID}>, you rolled doubles (${Dice1} and a ${Dice2}) and got out of jail free!`)
                 this.CurrentPlayer.Free() //free from jail
-                this.CurrentPlayer.Move(message, Dice1 + Dice2, this.Properties) //move
+                await this.CurrentPlayer.Move(message, Dice1 + Dice2, this.Properties) //move
             } else { //didn't roll doubles
                 if (this.CurrentPlayer.GetOutOfJail > 0) { //if they have at least 1 get out of jail card
                     await message.channel.send(`<@${userID}>, You rolled a ${Dice1} and a ${Dice2} and used one of your get out of jail free cards!`)
                     this.CurrentPlayer.GetOutOfJail--; //remove the card
-                    this.CurrentPlayer.Move(message, Dice1 + Dice2, this.Properties) //move
                     this.CurrentPlayer.Free() //Free them from jail
+                    await this.CurrentPlayer.Move(message, Dice1 + Dice2, this.Properties) //move
                 } else { //no get out of jail cards
                     if (this.CurrentPlayer.JailTime == 3) { //been in jail for 3 turns
                         this.CurrentPlayer.RemoveMoney(message, 50, null); //pay 50
                         await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and payed 50 dollars and got out of jail.`) //Inform
                         this.CurrentPlayer.Free(); //free
-                        this.CurrentPlayer.Move(message, Dice1 + Dice2, this.Properties) //move
+                        await this.CurrentPlayer.Move(message, Dice1 + Dice2, this.Properties) //move
                     } else { //been in jail for less than 3 turns
                         await message.channel.send("You are in jail and cannot move!").then(async msg => await msg.react("🛑")) //can't move
                     }
@@ -531,7 +518,7 @@ class Game {
                 }
             }
         } else { //not jailed
-            this.CurrentPlayer.Move(message, Dice1 + Dice2, this.Properties) //move
+            await this.CurrentPlayer.Move(message, Dice1 + Dice2, this.Properties) //move
         }
 
         await this.HandlePosition(message, userID, Dice1, Dice2)
@@ -551,7 +538,6 @@ class Game {
             this.CurrentPlayer.Doubles = false;
             this.CurrentPlayer.DoublesStreak = 0;
         }
-
     }
 
     async Stats(message) { //get stats for player
@@ -661,26 +647,34 @@ class Game {
             this.HighestBid = 0 //highest bid of 0
             this.Bidders = this.Players.concat().array() //put all players into an array that copys the players
             this.BiddersIndex = this.CurrentPlayerIndex; //Start off with the current player
-            await message.channel.send(`Let the bidding begin! <@${this.Bidders[this.BiddersIndex].ID}> type !bid [amount] to place a bid or type !bid quit to back out.`) //start bid
+            await message.channel.send(`Let the bidding begin! <@${this.Bidders[this.BiddersIndex].ID}> type !bid [amount] to place a bid or type !bid quit to back out. (Current bid is $${this.HighestBid})`).then(async msg => {await msg.react("❌"); await msg.react("⬆"); await msg.react("⏫")}) //start bid
         } else { //if bought or can't be bought
             this.CurrentPlayer.Rolled = false; //reset rolled
             if (this.CurrentPlayer.Doubles && this.CurrentPlayer.Money >= 0) { //if its doubles and they didn't go bankrupt
-                await message.channel.send("Roll again!").then(async msg => await msg.react("🎲"))
+                await message.channel.send("Roll again!").then(async msg => {await msg.react("🎲"); await msg.react("🏠")})
             } else { //if it wasn't doubles or they went bankrupt
                 this.CurrentPlayerIndex++; //next player
                 if (this.CurrentPlayerIndex >= this.Players.size) this.CurrentPlayerIndex = 0; //if past the last player reset to first
                 this.CurrentPlayer = this.Players.array()[this.CurrentPlayerIndex] //get current player
-                await message.channel.send(`<@${this.CurrentPlayer.ID}> it's your turn! You have $${this.CurrentPlayer.Money}`).then(async msg => await msg.react("🎲"))
+                await message.channel.send(`<@${this.CurrentPlayer.ID}> it's your turn! You have $${this.CurrentPlayer.Money}`).then(async msg => {await msg.react("🎲"); await msg.react("🏠")})
             }
         }
     }
 
-    async Auction(message) { //bidding
-        if (!this.InProgress) return await message.channel.send("the game hasen't started yet!") //must be in progress
-        if (!this.Bidding) return await message.channel.send("not currently bidding") //must be bidding
-        if (this.Bidders[this.BiddersIndex].ID != message.author.id) return await message.channel.send(`the current bidder is <@${Bidders[this.BiddersIndex].ID}>!`) //must be current bidder
+    async Auction(message, args, user) { //bidding
+        if (!user) {
+            var userID = message.author.id;
+            if (!this.InProgress) return await message.channel.send("the game hasen't started yet!") //must be in progress
+            if (!this.Bidding) return await message.channel.send("not currently bidding") //must be bidding
+            if (this.Bidders[this.BiddersIndex].ID != userID) return await message.channel.send(`the current bidder is <@${Bidders[this.BiddersIndex].ID}>!`) //must be current bidder    
+        } else {
+            var userID = user.id;
+            if (!this.InProgress) return; //must be in progress
+            if (!this.Bidding) return; //must be bidding
+            if (this.Bidders[this.BiddersIndex].ID != userID) return; //must be current bidder    
+        }
 
-        let amount = message.content.split(" ")[1] //get amount
+        let amount = args[0];
         if (!amount) return await message.channel.send(".bid [amount] or .bid quit")
         if (amount.toLowerCase() == "quit") { //if they quit
             this.Bidders.splice(this.BiddersIndex, 1) //remove the bidder
@@ -694,16 +688,16 @@ class Game {
                 CurrentProperty.Buy(winner) //buy it
                 this.CurrentPlayer.Rolled = false; //set rolled to false
                 if (this.CurrentPlayer.Doubles) { //if they rolled doubles
-                    await message.channel.send(`<@${this.CurrentPlayer.ID}> roll again!`).then(async msg => await msg.react("🎲"))
+                    await message.channel.send(`<@${this.CurrentPlayer.ID}> roll again!`).then(async msg => {await msg.react("🎲"); await msg.react("🏠")})
                 } else { //didn't roll doubles
                     this.CurrentPlayerIndex++;
                     if (this.CurrentPlayerIndex >= this.Players.size) this.CurrentPlayerIndex = 0; //reset to 0
                     this.CurrentPlayer = this.Players.array()[this.CurrentPlayerIndex]
-                    await message.channel.send(`<@${this.CurrentPlayer.ID}> it's your turn!`).then(async msg => await msg.react("🎲"))
+                    await message.channel.send(`<@${this.CurrentPlayer.ID}> it's your turn!`).then(async msg => {await msg.react("🎲"); await msg.react("🏠")})
                 }
             } else { //still more than 1 bidder
                 if (this.BiddersIndex >= this.Bidders.length) this.BiddersIndex = 0; //go to next bidder
-                await message.channel.send(`<@${this.Bidders[this.BiddersIndex].ID}> its your turn to bid!`)
+                await message.channel.send(`<@${this.Bidders[this.BiddersIndex].ID}> its your turn to bid! (Current bid is $${this.HighestBid})`).then(async msg => {await msg.react("❌"); await msg.react("⬆"); await msg.react("⏫")})
             }
         } else { //didn't quit
             amount = parseInt(amount) //convert to int
@@ -713,13 +707,20 @@ class Game {
             this.HighestBid = amount; //set highest bid
             this.BiddersIndex++; //next bidder
             if (this.BiddersIndex >= this.Bidders.length) this.BiddersIndex = 0;
-            await message.channel.send(`<@${this.Bidders[this.BiddersIndex].ID}> its your turn to bid!`)
+            await message.channel.send(`<@${this.Bidders[this.BiddersIndex].ID}> its your turn to bid! (Current bid is $${this.HighestBid})`).then(async msg => {await msg.react("❌"); await msg.react("⬆"); await msg.react("⏫")})
         }
     }
 
-    async BuyProperty(message) { //Buy a house
-        if (!this.InProgress) return await message.channel.send("the game hasen't started yet!") //has to have started
-        if (message.author.id != this.CurrentPlayer.ID) return await message.channel.send('its not your turn') //gotta be your turn
+    async BuyProperty(message, user) { //Buy a house
+        if (!user) {
+            var userID = message.author.id
+            if (!this.InProgress) return await message.channel.send("the game hasen't started yet!") //has to have started
+            if (userID != this.CurrentPlayer.ID) return await message.channel.send('its not your turn') //gotta be your turn    
+        } else {
+            var userID = user.id
+            if (!this.InProgress) return; //has to have started
+            if (userID != this.CurrentPlayer.ID) return; //gotta be your turn    
+        }
 
         let LeastHouses = 10; //least house is 10 (just has to be more than 5)
         let PropertyIndex; //null at first
@@ -767,7 +768,7 @@ class Game {
                 }
             }
         }
-        if (!FoundHouseIndex) return await  message.channel.send("couldn't find that property") //if haven't found a house
+        if (!FoundHouseIndex) return await message.channel.send("couldn't find that property") //if haven't found a house
         if (this.Properties[FoundHouseIndex].Houses > 0) { //if theres more than one house on it
             this.CurrentPlayer.AddMoney(message, Math.round(this.Properties[FoundHouseIndex].Building / 2)); //sell the house for half the house cost
             this.Properties[FoundHouseIndex].Houses--; //remove house
@@ -1094,7 +1095,7 @@ bot.on("message", async (message) => {
                     .addField(`${prefix}mortgage`, "Put property up for mortgage", true)
                     .addField(`${prefix}unmortgage`, "Rebuy property", true)
                     .addField(`${prefix}property`, "View all your owned properties and how many houses are on them", true)
-                    await message.channel.send(HelpEmbed)
+                await message.channel.send(HelpEmbed)
                 break;
             case "prefix": //change prefix
                 if (args[0]) { //if args
@@ -1183,7 +1184,7 @@ bot.on("message", async (message) => {
                 if (!bot.games.has(message.channel.id)) { //if no game
                     await message.channel.send(`there is no game in this channel. Do ${prefix}create to make a game`)
                 } else { //if game
-                    bot.games.get(message.channel.id).Auction(message)
+                    bot.games.get(message.channel.id).Auction(message, args)
                 }
                 break;
             case "house": //buy a house
@@ -1255,6 +1256,18 @@ bot.on("messageReactionAdd", async (messageReaction, user) => {
             break;
         case "☑":
             if (bot.games.has(messageReaction.message.channel.id)) bot.games.get(messageReaction.message.channel.id).Start(messageReaction.message, user)
+            break;
+        case "❌":
+            if (bot.games.has(messageReaction.message.channel.id)) bot.games.get(messageReaction.message.channel.id).Auction(messageReaction.message, ["quit"], user)
+            break;
+        case "⬆":
+            if (bot.games.has(messageReaction.message.channel.id)) bot.games.get(messageReaction.message.channel.id).Auction(messageReaction.message, [(bot.games.get(messageReaction.message.channel.id).HighestBid + 10).toString()], user)
+            break;
+        case "⏫":
+            if (bot.games.has(messageReaction.message.channel.id)) bot.games.get(messageReaction.message.channel.id).Auction(messageReaction.message, [(bot.games.get(messageReaction.message.channel.id).HighestBid + 100).toString()], user)
+            break;
+        case "🏠":
+            if (bot.games.has(messageReaction.message.channel.id)) bot.games.get(messageReaction.message.channel.id).BuyProperty(messageReaction.message, user);
             break;
     }
 })

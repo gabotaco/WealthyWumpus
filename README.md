@@ -33,29 +33,29 @@
 
 ## Commands
 
-Most of these are not necessary because of message reactions but if you prefer commands here is the list:
+Some commands have reactions to make it easier to play but heres the list of all commands:
 
-| Command | Description  |
-|---------|--------------|
-|!help  | **Get a list of all supported commands**|
-|!prefix [new prefix]  | **Change the server prefix**|
-|!create  | **Create a new game in the channel**|
-|!stop  | **Ends the game in the channel**|
-|!join  | **Join the game**|
-|!leave  | **Leave the current game**|
-|!start  | **Start the game**|
-|!leader [new leader]  | **Change the game leader**|
-|!roll  | **Roll the dice**|
-|!stats  | **Get a info about yourself**|
-|!buy  | **Buy the property you are currently on**|
-|!end  | **End your turn**|
-|!bid [amount\|quit]  | **Bid on property or back out**|
-|!house  | **Buy a house**|
-|!sell [property] {player} {amount} | **Sell a house on the property or the property to another player**|
-|!offer [confirm\|deny]  | **Accept or deny an offer from another player**|
-|!mortgage [property]  | **Mortgage a property**|
-|!unmortgage [property]  | **Unmortgage a property**|
-|!property  | **Get a list of all owned propertys and how many hosues are on it**|
+| Command | Description  | Has Reaction |
+|---------|--------------|------------- |
+|!help  | **Get a list of all supported commands**|❌|
+|!prefix [new prefix]  | **Change the server prefix**|❌|
+|!create  | **Create a new game in the channel**|❌|
+|!stop  | **Ends the game in the channel**|❌|
+|!join  | **Join the game**|✅|
+|!leave  | **Leave the current game**|❌|
+|!start  | **Start the game**|✅|
+|!leader [new leader]  | **Change the game leader**|❌|
+|!roll  | **Roll the dice**|✅|
+|!stats  | **Get a info about yourself**|❌|
+|!buy  | **Buy the property you are currently on**|✅|
+|!end  | **End your turn**|✅|
+|!bid [amount\|quit]  | **Bid on property or back out**|✅|
+|!house  | **Buy a house**|✅|
+|!sell [property] {player} {amount} | **Sell a house on the property or the property to another player**|❌|
+|!offer [confirm\|deny]  | **Accept or deny an offer from another player**|✅|
+|!mortgage [property]  | **Mortgage a property**|❌|
+|!unmortgage [property]  | **Unmortgage a property**|❌|
+|!property  | **Get a list of all owned propertys and how many hosues are on it**|❌|
 
 ## How to Play
 

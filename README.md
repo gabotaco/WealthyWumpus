@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-    <img src="https://cdn.discordapp.com/attachments/486858766608891905/593467231330107413/Artboard_1.png" alt="Money Man" width="200"></a>
+    <img src="https://cdn.discordapp.com/attachments/593554477844529152/593819333596151820/Artboard_1.png" alt="Money Man" width="250"></a>
   <br>
   Money Man
   <br>

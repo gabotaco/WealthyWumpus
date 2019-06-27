@@ -1,7 +1,7 @@
 <h1 align="center">
-    <img src="https://cdn.discordapp.com/attachments/593554477844529152/593819333596151820/Artboard_1.png" alt="Money Man" width="250"></a>
+    <img src="https://cdn.discordapp.com/attachments/593554477844529152/593819333596151820/Artboard_1.png" alt="Wealthy Wumpus" width="250"></a>
   <br>
-  Money Man
+  Wealthy Wumpus
   <br>
 </h1>
 

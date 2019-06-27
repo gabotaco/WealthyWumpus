@@ -22,7 +22,7 @@
 
 # Key Features
 
-* Easily Custamizable
+* Easily Customizable
   - Add and change properties
   - Add and change Community Chest and Chance cards
 * Object Oriented
@@ -35,7 +35,7 @@
 
 # Commands
 
-Some commands have reactions to make it easier to play but heres the list of all commands:
+Some commands have reactions to make it easier to play but here's the list of all commands:
 
 | Command | Description  | Has Reaction |
 |---------|--------------|------------- |
@@ -57,7 +57,7 @@ Some commands have reactions to make it easier to play but heres the list of all
 |!offer [confirm\|deny]  | **Accept or deny an offer from another player**|✅|
 |!mortgage [property]  | **Mortgage a property**|❌|
 |!unmortgage [property]  | **Unmortgage a property**|❌|
-|!property  | **Get a list of all owned propertys and how many hosues are on it**|❌|
+|!property  | **Get a list of all owned property's and how many houses are on it**|❌|
 
 # How to Play
 
@@ -83,7 +83,7 @@ The only change made for this bot is that when the player goes bankrupt to the b
 
 ## Auctions
 
-When property is put up for auction, the player who landed on it begins the auction. Property starts at $0 during an auction and the first player has to bid at least $1. You have 4 options for bidding. You can either do `!bid [amount]` to bid a custom amount or you can react with the 3 emojis. ❌ will take you out of the auction, ⬆ will raise the current bid by $10, and ⏫ will raise the current bid by $100. The auction is over when there is only 1 person left.  
+When property is put up for auction, the player who landed on it begins the auction. Property starts at $0 during an auction and the first player must bid at least $1. You have 4 options for bidding. You can either do `!bid [amount]` to bid a custom amount or you can react with the 3 emojis. ❌ will take you out of the auction, ⬆ will raise the current bid by $10, and ⏫ will raise the current bid by $100. The auction is over when there is only 1 person left.  
 
 ## Jail
 
@@ -91,11 +91,11 @@ A player can go to jail in 3 ways. Either by getting a card that sends them to j
 
 ## Buying Houses
 
-In order to buy a house you have to own all properties in a color group. Once that is done houses must be built evenly across all color groups that you own. Reacting with the 🏠 or doing `!house` will find the cheapest eligable property and build a house. 
+In order to buy a house, you have to own all properties in a color group. Once that is done houses must be built evenly across all color groups that you own. Reacting with the 🏠 or doing `!house` will find the cheapest eligible property and build a house. 
 
 ## Selling Property
 
-To offer property to another player you must sell all houses in that color group (it will tell you if you need to). To sell houses do `!sell [property]` (you don't need to specify a person or amount). Once there are no more houses on that color group you can do `!sell [property] [person] [amount]` to offer it to another player. When you offer to the player the bot will notify them and the player can react with ✔ to accept it and pay you for it or ✖ to deny it. They must deny it before they can recieve another offer. 
+To offer property to another player you must sell all houses in that color group (it will tell you if you need to). To sell houses do `!sell [property]` (you don't need to specify a person or amount). Once there are no more houses on that color group you can do `!sell [property] [person] [amount]` to offer it to another player. When you offer to the player the bot will notify them and the player can react with ✔ to accept it and pay you for it or ✖ to deny it. They must deny it before they can receive another offer. 
 
 # Screenshots
 

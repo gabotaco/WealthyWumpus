@@ -215,7 +215,7 @@ class Player {
     async RemoveMoney(message, num, OtherPlayer) { //remove money
         this.Money -= parseInt(num) //remove
         if (this.Money < 0) { //if they are bankrupt
-            await message.channel.send(`<@${this.ID}> you are in debt!! If you are still in debt when you end your turn you will lose!`) //notify
+            await message.channel.send(`<@${this.ID}>, you are in debt!! If you are still in debt when you end your turn you will lose!`) //notify
             this.PaidPlayer = OtherPlayer //set who made them bankrupt (can be null if bank)
         }
     }
@@ -230,7 +230,7 @@ class Player {
             if (this.Position >= Properties.length) { //if they went around the board
                 this.AddMoney(200); //add 200
                 this.Position -= Properties.length; //move them back onto the board
-                await message.channel.send("you passed go!") //inform
+                await message.channel.send("You passed go and collected $200!") //inform
             }
             resolve();
         })
@@ -266,46 +266,46 @@ class Game {
 
         this.Properties = Props;
 
-        message.channel.send(`Welcome to Discord Monopoly! Get your friends to type ${botconfig.prefixes[message.guild.id].prefix}join to join the game`).then(async msg => await msg.react("🖐"));
+        message.channel.send(`Welcome to Discord Monopoly! Get your friends to type ${botconfig.prefixes[message.guild.id].prefix}join to join the game or react with the hand below!`).then(async msg => await msg.react("🖐"));
     }
 
     async NewPlayer(message, user) { //new player
         if (!user) {
             var userID = message.author.id;
             if (this.Players.has(userID)) return await message.channel.send(`<@${userID}>, you are already in this game!`) //Already in the game
-            if (this.InProgress) return await message.channel.send(`<@${userID}>, you can't join a game thats already started!`) //If the game is in progress    
-            if (this.Players.length == 8) return await message.channel.send(`<@${userID}> the game is full!`) //game can't be over 8 people because rules of monopoly
+            if (this.InProgress) return await message.channel.send(`<@${userID}>, you can't join a game that's already started!`) //If the game is in progress    
+            if (this.Players.length == 8) return await message.channel.send(`<@${userID}>, the game is full!`) //game can't be over 8 people because rules of monopoly
         } else {
             var userID = user.id;
             if (this.Players.has(userID)) return;
             if (this.InProgress) return;
-            if (this.Players.length == 8) return await message.channel.send(`<@${userID}> the game is full!`) //game can't be over 8 people because rules of monopoly
+            if (this.Players.length == 8) return await message.channel.send(`<@${userID}>, the game is full!`) //game can't be over 8 people because rules of monopoly
         }
 
         this.Players.set(userID, new Player(userID)) //Add them to the game
-        await message.channel.send(`<@${userID}> welcome to the game! We currently have ${this.Players.size} players!`).then(async msg => await msg.react("☑")) //Inform
+        await message.channel.send(`<@${userID}>, welcome to the game! We currently have ${this.Players.size} players!`).then(async msg => await msg.react("☑")) //Inform
     }
 
     async PlayerLeave(message) { //Player leaves
         if (!this.Players.has(message.author.id)) return await message.channel.send("You aren't in this game!") //can't leave if you aren't in it
-        if (message.author.id == this.Leader) return await message.channel.send(`the leader can't leave! Do ${botconfig.prefixes[message.guild.id].prefix}leader to change the leader!`) //Leader can't leave
+        if (message.author.id == this.Leader) return await message.channel.send(`The leader can't leave! Do ${botconfig.prefixes[message.guild.id].prefix}leader to change the leader!`) //Leader can't leave
         if (this.InProgress) { //If the game is in progress
             this.Players.get(message.author.id).Money = -1 //set money to -1
             this.CheckAndHandleBankrupt(message, this.Players.get(message.author.id)) //Check for bankrupt and then distribute property
         } else { //Game isn't in progress
             this.Players.delete(message.author.id) //delete from players
-            await message.channel.send(`sorry to see you leave :(`) //Inform
+            await message.channel.send(`Sorry to see you leave :(`) //Inform
         }
     }
 
     async ChangeLeader(message) { //change the game leader
-        if (this.Leader != message.author.id) return await message.channel.send(`Only the leader can change the leader`) //only game leader
+        if (this.Leader != message.author.id) return await message.channel.send(`Only the leader can change the leader!`) //only game leader
 
         const NewLeader = message.mentions.members.first() //new leader is first mention
         if (NewLeader) { //if theres a new leader
-            if (this.Players.has(NewLeader.id)) return await message.channel.send("the new leader has to be in this game!")
+            if (this.Players.has(NewLeader.id)) return await message.channel.send("The new leader has to be in this game!")
             this.Leader = NewLeader.id //set to new leader
-            await message.channel.send(`Changed leader to <@${this.Leader}>!`) //inform
+            await message.channel.send(`Changed the leader to <@${this.Leader}>!`) //inform
         } else { //not a new leader
             await message.channel.send(".leader [new leader]")
         }
@@ -314,13 +314,13 @@ class Game {
     async Start(message, user) { //start the game
         if (!user) {
             var userID = message.author.id;
-            if (userID != this.Leader) return await message.channel.send(`Only <@${this.Leader}> can start this game!`) //only leader can start
-            if (this.Players.size < 2) return await message.channel.send("I can't start a game with less than 2 players") //only can start with 2 or more players
-            if (this.InProgress) return await message.channel.send(`the game has already started! It is <@${this.CurrentPlayer.ID}>'s turn!`) //can't start again
+            if (userID != this.Leader) return await message.channel.send(`Only <@${this.Leader}> can start the game!`) //only leader can start
+            if (this.Players.size < 2) return await message.channel.send("I can't start a game with less than 2 players...") //only can start with 2 or more players
+            if (this.InProgress) return await message.channel.send(`<@${userID}>, the game has already started!`) //can't start again
         } else {
             var userID = user.id;
             if (userID != this.Leader) return; //only leader can start
-            if (this.Players.size < 2) return await message.channel.send("I can't start a game with less than 2 players") //only can start with 2 or more players
+            if (this.Players.size < 2) return await message.channel.send("I can't start a game with less than 2 players...") //only can start with 2 or more players
             if (this.InProgress) return; //can't start again    
         }
 
@@ -328,7 +328,7 @@ class Game {
         this.CurrentPlayerIndex = Math.floor(Math.random() * this.Players.size) //pick random starting player
         this.CurrentPlayer = this.Players.array()[this.CurrentPlayerIndex] //set currentplayer
 
-        await message.channel.send(`Lets get the show on the road! <@${this.CurrentPlayer.ID}>, you are going first! Do ${botconfig.prefixes[message.guild.id].prefix}roll to roll!`).then(async msg => {
+        await message.channel.send(`Lets get the show on the road! <@${this.CurrentPlayer.ID}>, you are going first! Do ${botconfig.prefixes[message.guild.id].prefix}roll to roll or just react with the dice!`).then(async msg => {
             await msg.react("🎲");
             await msg.react("🏠")
         }) //inform
@@ -338,7 +338,7 @@ class Game {
         return new Promise(async (resolve, reject) => {
             const CurrentProperty = this.Properties[this.CurrentPlayer.Position] //Get current property
             if (CurrentProperty.Color == "GO") { //Currently on GO
-                await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on go and collected $200.`).then(async msg => await msg.react("🛑")) //inform
+                await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on go.`).then(async msg => await msg.react("🛑")) //inform
             } else if (CurrentProperty.Color == "Chest" || CurrentProperty.Color == "Chance") { //Currently on Chest or Chance
                 if (CurrentProperty.Color == "Chest") { //If its chest
                     var card = CommunityChestCards[Math.floor(Math.random() * CommunityChestCards.length)] //random chest card
@@ -346,7 +346,7 @@ class Game {
                     var card = ChanceCards[Math.floor(Math.random() * ChanceCards.length)] //random chance card
                 }
 
-                let Message = `<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on a ${CurrentProperty.Color.toLowerCase()} card and it says "${card.Text}".` //Inform about card
+                let Message = `<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on a ${CurrentProperty.Color.toLowerCase()} card that says, "${card.Text}".` //Inform about card
                 if (card.MoveTo == 10) { //if move to jail
                     this.CurrentPlayer.Jail();
                     await message.channel.send(Message).then(async msg => await msg.react("🛑")) //send message
@@ -403,7 +403,7 @@ class Game {
                 if (CurrentProperty.Owner) { //if its owned
                     if (CurrentProperty.Owner.ID != this.CurrentPlayer.ID) { //if its owned by someone else
                         if (CurrentProperty.Mortgaged) { //if its mortgaged
-                            await message.channel.send(`<@${userID}>, You rolled a ${Dice1} and a ${Dice2}. You landed on <@${CurrentProperty.Owner.ID}>'s ${CurrentProperty.Name} but its mortgaged...`).then(async msg => await msg.react("🛑"))
+                            await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on <@${CurrentProperty.Owner.ID}>'s ${CurrentProperty.Name} but its mortgaged...`).then(async msg => await msg.react("🛑"))
                         } else { //if its not mortgaged
                             const Price = (Dice1 + Dice2) * CurrentProperty.Rent[CurrentProperty.Owner.Utility] //price is dice roll * rent
                             this.CurrentPlayer.RemoveMoney(message, Price, CurrentProperty.Owner) //remove amount
@@ -411,10 +411,10 @@ class Game {
                             await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2}. You landed on <@${CurrentProperty.Owner.ID}>'s ${CurrentProperty.Name} and paid them $${Price}.`).then(async msg => await msg.react("🛑"))
                         }
                     } else { //if you land on your own utility
-                        await message.channel.send(`<@${userID}> You rolled a ${Dice1} and a ${Dice2} and landed on your own ${CurrentProperty.Name}...`).then(async msg => await msg.react("🛑"))
+                        await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on your own ${CurrentProperty.Name}...`).then(async msg => await msg.react("🛑"))
                     }
                 } else { //if its not owned
-                    await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name}. It costs $${CurrentProperty.Price}. Do ${botconfig.prefixes[message.guild.id].prefix}buy to buy it or do ${botconfig.prefixes[message.guild.id].prefix}end to auction it! You currently have $${this.CurrentPlayer.Money}`, CurrentProperty.Info()).then(async msg => {
+                    await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name}. It costs $${CurrentProperty.Price}. React with the check mark or do ${botconfig.prefixes[message.guild.id].prefix}buy to buy it or react with the stop sign or do ${botconfig.prefixes[message.guild.id].prefix}end to auction it! You currently have $${this.CurrentPlayer.Money}`, CurrentProperty.Info()).then(async msg => {
                         await msg.react("✅");
                         await msg.react("🛑");
                     })
@@ -434,11 +434,11 @@ class Game {
                             CurrentProperty.Owner.AddMoney(CurrentProperty.Rent[CurrentProperty.Owner.RR]) //add money to owner
                             await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on <@${CurrentProperty.Owner.ID}>'s ${CurrentProperty.Name} and payed them $${CurrentProperty.Rent[CurrentProperty.Owner.RR]}`).then(async msg => await msg.react("🛑"))
                         } else { //if its owned by you
-                            await message.channel.send(`<@${userID}> you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name} but you already own it!`).then(async msg => await msg.react("🛑"))
+                            await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name} but you already own it!`).then(async msg => await msg.react("🛑"))
                         }
                     }
                 } else { //not owned
-                    await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name}. It costs $${CurrentProperty.Price}. Do ${botconfig.prefixes[message.guild.id].prefix}buy to buy it or ${botconfig.prefixes[message.guild.id].prefix}end to auction it! You currently have $${this.CurrentPlayer.Money}`, CurrentProperty.Info()).then(async msg => {
+                    await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name}. It costs $${CurrentProperty.Price}. React with the check mark or do ${botconfig.prefixes[message.guild.id].prefix}buy to buy it or react with the stop sign or do ${botconfig.prefixes[message.guild.id].prefix}end to auction it! You currently have $${this.CurrentPlayer.Money}`, CurrentProperty.Info()).then(async msg => {
                         await msg.react("✅");
                         await msg.react("🛑");
                     })
@@ -451,7 +451,7 @@ class Game {
                             await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}> but it is mortgaged...`).then(async msg => await msg.react("🛑"))
                         } else { //not mortgaged
                             if (CurrentProperty.Houses > 0) { //more than 0 house
-                                await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed him $${CurrentProperty.Rent[CurrentProperty.Houses]}!`).then(async msg => await msg.react("🛑"))
+                                await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed them $${CurrentProperty.Rent[CurrentProperty.Houses]}!`).then(async msg => await msg.react("🛑"))
                                 this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses], CurrentProperty.Owner) //remove money
                                 CurrentProperty.Owner.AddMoney(CurrentProperty.Rent[CurrentProperty.Houses]) //add money
                             } else { //0 houses
@@ -459,28 +459,28 @@ class Game {
                                     if (CurrentProperty.Owner[CurrentProperty.Color] < 2) { //doesn't own all 2
                                         this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses], CurrentProperty.Owner)
                                         CurrentProperty.Owner.AddMoney(CurrentProperty.Rent[CurrentProperty.Houses])
-                                        await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed him $${CurrentProperty.Rent[CurrentProperty.Houses]}!`).then(async msg => await msg.react("🛑"))
+                                        await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed them $${CurrentProperty.Rent[CurrentProperty.Houses]}!`).then(async msg => await msg.react("🛑"))
                                     } else { //owns all 2
                                         this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2, CurrentProperty.Owner) //multiply rent by 2
                                         CurrentProperty.Owner.AddMoney(CurrentProperty.Rent[CurrentProperty.Houses] * 2)
-                                        await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed him $${CurrentProperty.Rent[CurrentProperty.Houses] * 2}!`).then(async msg => await msg.react("🛑"))
+                                        await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed them $${CurrentProperty.Rent[CurrentProperty.Houses] * 2}!`).then(async msg => await msg.react("🛑"))
                                     }
                                 } else { //any other color
                                     if (CurrentProperty.Owner[CurrentProperty.Color] < 3) { //doesn't own all 3
                                         this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses], CurrentProperty.Owner)
                                         CurrentProperty.Owner.AddMoney(CurrentProperty.Rent[CurrentProperty.Houses])
-                                        await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed him $${CurrentProperty.Rent[CurrentProperty.Houses]}!`).then(async msg => await msg.react("🛑"))
+                                        await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed them $${CurrentProperty.Rent[CurrentProperty.Houses]}!`).then(async msg => await msg.react("🛑"))
                                     } else { //does own all 3
                                         this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Rent[CurrentProperty.Houses] * 2, CurrentProperty.Owner) //multiply rent by 2
                                         CurrentProperty.Owner.AddMoney(CurrentProperty.Rent[CurrentProperty.Houses] * 2)
-                                        await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed him $${CurrentProperty.Rent[CurrentProperty.Houses] * 2}!`).then(async msg => await msg.react("🛑"))
+                                        await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name} which is owned by <@${CurrentProperty.Owner.ID}>. You payed them $${CurrentProperty.Rent[CurrentProperty.Houses] * 2}!`).then(async msg => await msg.react("🛑"))
                                     }
                                 }
                             }
                         }
                     }
                 } else { //nobody owns it
-                    await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name}. Do ${botconfig.prefixes[message.guild.id].prefix}buy to buy the property or do ${botconfig.prefixes[message.guild.id].prefix}end to auction it! You currently have $${this.CurrentPlayer.Money}`, CurrentProperty.Info()).then(async msg => {
+                    await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name}. React with the check mark or do ${botconfig.prefixes[message.guild.id].prefix}buy to buy the property or react with the stop sign or do ${botconfig.prefixes[message.guild.id].prefix}end to auction it! You currently have $${this.CurrentPlayer.Money}`, CurrentProperty.Info()).then(async msg => {
                         await msg.react("✅");
                         await msg.react("🛑");
                     })
@@ -493,9 +493,9 @@ class Game {
     async Roll(message, user) { //roll
         if (!user) {
             var userID = message.author.id;
-            if (!this.InProgress) return await message.channel.send("the game hasen't started yet!") //if its not in progress
-            if (message.author.id != this.CurrentPlayer.ID) return await message.channel.send("it's not your turn!") //current player can only roll
-            if (this.CurrentPlayer.Rolled) return await message.channel.send("you already rolled") //if they have already rolled    
+            if (!this.InProgress) return await message.channel.send(`<@${userID}>, the game hasen't started yet!`) //if its not in progress
+            if (message.author.id != this.CurrentPlayer.ID) return await message.channel.send(`<@${userID}>, it's not your turn!`) //current player can only roll
+            if (this.CurrentPlayer.Rolled) return await message.channel.send(`<@${userID}>, you already rolled`) //if they have already rolled    
         } else {
             var userID = user.id;
             if (!this.InProgress) return;
@@ -511,12 +511,12 @@ class Game {
         if (this.CurrentPlayer.Jailed) { //if the player is in jail
             this.CurrentPlayer.JailTime++; //increase jail time
             if (Dice1 == Dice2) { //If they rolled doubles
-                await message.channel.send(`<@${userID}>, you rolled doubles (${Dice1} and a ${Dice2}) and got out of jail free!`)
+                await message.channel.send(`<@${userID}>, you rolled doubles (${Dice1} and a ${Dice2}) and got out of jail for free!`)
                 this.CurrentPlayer.Free() //free from jail
                 await this.CurrentPlayer.Move(message, Dice1 + Dice2, this.Properties) //move
             } else { //didn't roll doubles
                 if (this.CurrentPlayer.GetOutOfJail > 0) { //if they have at least 1 get out of jail card
-                    await message.channel.send(`<@${userID}>, You rolled a ${Dice1} and a ${Dice2} and used one of your get out of jail free cards!`)
+                    await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and used one of your get out of jail free cards!`)
                     this.CurrentPlayer.GetOutOfJail--; //remove the card
                     this.CurrentPlayer.Free() //Free them from jail
                     await this.CurrentPlayer.Move(message, Dice1 + Dice2, this.Properties) //move
@@ -527,7 +527,7 @@ class Game {
                         this.CurrentPlayer.Free(); //free
                         await this.CurrentPlayer.Move(message, Dice1 + Dice2, this.Properties) //move
                     } else { //been in jail for less than 3 turns
-                        await message.channel.send(`You rolled a ${Dice1} and a ${Dice2} but you are in jail and cannot move!`).then(async msg => await msg.react("🛑")) //can't move
+                        await message.channel.send(`you rolled a ${Dice1} and a ${Dice2} but you are in jail and cannot move!`).then(async msg => await msg.react("🛑")) //can't move
                     }
 
                 }
@@ -545,9 +545,6 @@ class Game {
                 this.CurrentPlayer.DoublesStreak = 0; //remove streak
                 this.CurrentPlayer.Doubles = false; //remove doubles
                 this.CurrentPlayer.Jail(); //jail them
-                await message.channel.send("you rolled doubles 3 times in a row and are now in jail!")
-            } else { //not third time
-                await message.channel.send("you rolled doubles so you get to go again!")
             }
         } else { //not doubles
             this.CurrentPlayer.Doubles = false;
@@ -556,7 +553,7 @@ class Game {
     }
 
     async Stats(message) { //get stats for player
-        if (!this.Players.has(message.author.id)) return message.channel.send("you aren't in this game")
+        if (!this.Players.has(message.author.id)) return message.reply(`you aren't in this game`)
         const player = this.Players.get(message.author.id)
         const PlayerEmbed = new Discord.RichEmbed()
             .setTitle(`Stats for ${message.member.displayName}`)
@@ -581,9 +578,9 @@ class Game {
     async Buy(message, user) { //Buy current property
         if (!user) {
             var userID = message.author.id
-            if (!this.Players.has(userID)) return await message.channel.send("you aren't in this game.") //must be in game
-            if (!this.InProgress) return await message.channel.send("the game hasen't started yet!") //game has to be in progress
-            if (userID != this.CurrentPlayer.ID) return await message.channel.send("it's not your turn!") //has to be their turn    
+            if (!this.Players.has(userID)) return await message.reply("you aren't in this game.") //must be in game
+            if (!this.InProgress) return await message.reply("the game hasen't started yet!") //game has to be in progress
+            if (userID != this.CurrentPlayer.ID) return await message.reply("it's not your turn!") //has to be their turn    
         } else {
             var userID = user.id
             if (!this.Players.has(userID)) return;
@@ -594,7 +591,7 @@ class Game {
         const CurrentProperty = this.Properties[this.CurrentPlayer.Position] //Get property they are on
         if (!CurrentProperty.Price) return await message.channel.send(`<@${userID}>, you can't buy this!`).then(async msg => await msg.react("🛑")) //if there isn't a price
         if (CurrentProperty.Owner) return await message.channel.send(`<@${CurrentProperty.Owner.ID}> already owns this!`).then(async msg => await msg.react("🛑")) //if theres an owner
-        if (CurrentProperty.Price > this.CurrentPlayer.Money) return await message.channel.send(`<@${userID}> you don't have enough money to buy this!`).then(async msg => await msg.react("🛑")) //if its over their price 
+        if (CurrentProperty.Price > this.CurrentPlayer.Money) return await message.channel.send(`<@${userID}>, you don't have enough money to buy this!`).then(async msg => await msg.react("🛑")) //if its over their price 
         else { //if they can afford it
             this.CurrentPlayer.RemoveMoney(message, CurrentProperty.Price, null); //remove money
             CurrentProperty.Buy(this.CurrentPlayer) //buy it
@@ -645,14 +642,14 @@ class Game {
     async End(message, user) { //end turn
         if (!user) {
             var userID = message.author.id
-            if (!this.InProgress) return await message.channel.send("the game hasen't started yet!") //if not in progress
-            if (userID != this.CurrentPlayer.ID) return await message.channel.send('its not your turn') //if not their turn
-            if (!this.CurrentPlayer.Rolled) return await message.channel.send("you haven't rolled yet") //if haven't rolled
+            if (!this.InProgress) return await message.reply("the game hasen't started yet!") //if not in progress
+            if (userID != this.CurrentPlayer.ID) return await message.reply('its not your turn') //if not their turn
+            if (!this.CurrentPlayer.Rolled) return await message.reply("you haven't rolled yet") //if haven't rolled
         } else {
             var userID = user.id;
             if (!this.InProgress) return;
             if (userID != this.CurrentPlayer.ID) return; //if not their turn
-            if (!this.CurrentPlayer.Rolled) return await message.channel.send("you haven't rolled yet") //if haven't rolled
+            if (!this.CurrentPlayer.Rolled) return await message.channel.send(`<@${userID}>, you haven't rolled yet`) //if haven't rolled
         }
 
         await this.CheckAndHandleBankrupt(message, this.CurrentPlayer) //check for bankruptcy
@@ -662,7 +659,7 @@ class Game {
             this.HighestBid = 0 //highest bid of 0
             this.Bidders = this.Players.concat().array() //put all players into an array that copys the players
             this.BiddersIndex = this.CurrentPlayerIndex; //Start off with the current player
-            await message.channel.send(`Let the bidding begin! <@${this.Bidders[this.BiddersIndex].ID}> type !bid [amount] to place a bid or type !bid quit to back out. (Current bid is $${this.HighestBid})`).then(async msg => {
+            await message.channel.send(`Let the bidding begin! <@${this.Bidders[this.BiddersIndex].ID}> type !bid [amount] to place a bid or use the emojis. ❌ to quit, ⬆ raise by $10, or ⏫ to raise by $100. Current bid is $${this.HighestBid}`).then(async msg => {
                 await msg.react("❌");
                 await msg.react("⬆");
                 await msg.react("⏫")
@@ -670,7 +667,7 @@ class Game {
         } else { //if bought or can't be bought
             this.CurrentPlayer.Rolled = false; //reset rolled
             if (this.CurrentPlayer.Doubles && this.CurrentPlayer.Money >= 0) { //if its doubles and they didn't go bankrupt
-                await message.channel.send("Roll again!").then(async msg => {
+                await message.channel.send(`<@${userID}>, roll again!`).then(async msg => {
                     await msg.react("🎲");
                     await msg.react("🏠")
                 })
@@ -689,9 +686,9 @@ class Game {
     async Auction(message, args, user) { //bidding
         if (!user) {
             var userID = message.author.id;
-            if (!this.InProgress) return await message.channel.send("the game hasen't started yet!") //must be in progress
-            if (!this.Bidding) return await message.channel.send("not currently bidding") //must be bidding
-            if (this.Bidders[this.BiddersIndex].ID != userID) return await message.channel.send(`the current bidder is <@${Bidders[this.BiddersIndex].ID}>!`) //must be current bidder    
+            if (!this.InProgress) return await message.reply("the game hasen't started yet!") //must be in progress
+            if (!this.Bidding) return await message.reply("we aren't currently bidding") //must be bidding
+            if (this.Bidders[this.BiddersIndex].ID != userID) return await message.reply(`the current bidder is <@${Bidders[this.BiddersIndex].ID}>!`) //must be current bidder    
         } else {
             var userID = user.id;
             if (!this.InProgress) return; //must be in progress
@@ -703,17 +700,17 @@ class Game {
         if (!amount) return await message.channel.send(".bid [amount] or .bid quit")
         if (amount.toLowerCase() == "quit") { //if they quit
             this.Bidders.splice(this.BiddersIndex, 1) //remove the bidder
-            await message.channel.send("removed you from the bidders")
+            await message.channel.send(`<@${userID}>, removed you from the bidders`)
             if (this.Bidders.length == 1) { //if only 1 bidder
                 this.Bidding = false; //stop bidding
                 const winner = this.Players.get(this.Bidders[0].ID) //winner as a player
                 const CurrentProperty = this.Properties[this.CurrentPlayer.Position] //get the property they won
-                await message.channel.send(`<@${winner.ID}> congrats you won ${this.Properties[this.CurrentPlayer.Position].Name} for $${this.HighestBid}`) //inform
+                await message.channel.send(`<@${winner.ID}> congrats you won ${this.Properties[this.CurrentPlayer.Position].Name} for $${this.HighestBid}!`) //inform
                 winner.RemoveMoney(message, this.HighestBid, null); //remove money
                 CurrentProperty.Buy(winner) //buy it
                 this.CurrentPlayer.Rolled = false; //set rolled to false
                 if (this.CurrentPlayer.Doubles) { //if they rolled doubles
-                    await message.channel.send(`<@${this.CurrentPlayer.ID}> roll again!`).then(async msg => {
+                    await message.channel.send(`<@${this.CurrentPlayer.ID}>, you rolled doubles so you get to roll again!`).then(async msg => {
                         await msg.react("🎲");
                         await msg.react("🏠")
                     })
@@ -728,7 +725,7 @@ class Game {
                 }
             } else { //still more than 1 bidder
                 if (this.BiddersIndex >= this.Bidders.length) this.BiddersIndex = 0; //go to next bidder
-                await message.channel.send(`<@${this.Bidders[this.BiddersIndex].ID}> its your turn to bid! (Current bid is $${this.HighestBid})`).then(async msg => {
+                await message.channel.send(`<@${this.Bidders[this.BiddersIndex].ID}> its your turn to bid! ❌ to quit bidding, ⬆ to raise by $10, and ⏫ to raise by $100 (Current bid is $${this.HighestBid})`).then(async msg => {
                     await msg.react("❌");
                     await msg.react("⬆");
                     await msg.react("⏫")
@@ -736,13 +733,13 @@ class Game {
             }
         } else { //didn't quit
             amount = parseInt(amount) //convert to int
-            if (!amount) return await message.channel.send("you must specify a valid amount or say !bid quit")
-            if (amount <= this.HighestBid) return await message.channel.send(`you must bid higher than $${this.HighestBid} or say !bid quit`) //has to be higher
-            if (amount > this.Bidders[this.BiddersIndex].Money) return await message.channel.send("thats above the amount of money you have!")
+            if (!amount) return await message.channel.send(`<@${userID}>, you must specify a valid amount or say !bid quit`)
+            if (amount <= this.HighestBid) return await message.channel.send(`${userID}, you must bid higher than $${this.HighestBid} or say !bid quit`) //has to be higher
+            if (amount > this.Bidders[this.BiddersIndex].Money) return await message.channel.send(`<@${userID}>, thats above the amount of money you have!`)
             this.HighestBid = amount; //set highest bid
             this.BiddersIndex++; //next bidder
             if (this.BiddersIndex >= this.Bidders.length) this.BiddersIndex = 0;
-            await message.channel.send(`<@${this.Bidders[this.BiddersIndex].ID}> its your turn to bid! (Current bid is $${this.HighestBid})`).then(async msg => {
+            await message.channel.send(`<@${this.Bidders[this.BiddersIndex].ID}> its your turn to bid! ❌ to quit bidding, ⬆ to raise by $10, and ⏫ to raise by $100 (Current bid is $${this.HighestBid})`).then(async msg => {
                 await msg.react("❌");
                 await msg.react("⬆");
                 await msg.react("⏫")
@@ -753,8 +750,8 @@ class Game {
     async BuyProperty(message, user) { //Buy a house
         if (!user) {
             var userID = message.author.id
-            if (!this.InProgress) return await message.channel.send("the game hasen't started yet!") //has to have started
-            if (userID != this.CurrentPlayer.ID) return await message.channel.send('its not your turn') //gotta be your turn    
+            if (!this.InProgress) return await message.reply("the game hasen't started yet!") //has to have started
+            if (userID != this.CurrentPlayer.ID) return await message.reply('its not your turn') //gotta be your turn    
         } else {
             var userID = user.id
             if (!this.InProgress) return; //has to have started
@@ -779,18 +776,18 @@ class Game {
                 }
             }
         }
-        if (!PropertyIndex) return await message.channel.send("you can't buy a house on anything!").then(async msg => await msg.react("🛑")) //If there isn't a property index
+        if (!PropertyIndex) return await message.channel.send(`<@${userID}>, you can't buy a house on anything!`).then(async msg => await msg.react("🛑")) //If there isn't a property index
         const CurrentProperty = this.Properties[PropertyIndex]
-        if (CurrentProperty.Houses == 5) return await message.channel.send("You can't build anymore houses").then(async msg => await msg.react("🛑")) //if theres already 5 houses
-        if (CurrentProperty.Building > this.CurrentPlayer.Money) return await message.channel.send("You don't have enough money to build a house").then(async msg => await msg.react("🛑")) //if they can't afford it
+        if (CurrentProperty.Houses == 5) return await message.channel.send(`<@${userID}>, you can't build anymore houses`).then(async msg => await msg.react("🛑")) //if theres already 5 houses
+        if (CurrentProperty.Building > this.CurrentPlayer.Money) return await message.channel.send(`<@${userID}>, you don't have enough money to build a house`).then(async msg => await msg.react("🛑")) //if they can't afford it
         this.CurrentPlayer.RemoveMoney(message, this.Properties[PropertyIndex].Building, null) //remove money for the building cost
         this.Properties[PropertyIndex].Houses++; //increase houses
-        await message.channel.send(`you spent $${this.Properties[PropertyIndex].Building} and now have ${this.Properties[PropertyIndex].Houses} ${(this.Properties[PropertyIndex].Houses == 1)?"house":"houses"} on ${this.Properties[PropertyIndex].Name}!`).then(async msg => await msg.react("🛑"))
+        await message.channel.send(`<@${userID}>, you spent $${this.Properties[PropertyIndex].Building} and now have ${this.Properties[PropertyIndex].Houses} ${(this.Properties[PropertyIndex].Houses == 1)?"house":"houses"} on ${this.Properties[PropertyIndex].Name}!`).then(async msg => await msg.react("🛑"))
     }
 
     async Sell(message) { //sell a property
-        if (!this.InProgress) return await message.channel.send("the game hasen't started yet!") //if not in progress
-        if (message.author.id != this.CurrentPlayer.ID) return await message.channel.send('its not your turn') //if its not their turn
+        if (!this.InProgress) return await message.reply("the game hasen't started yet!") //if not in progress
+        if (message.author.id != this.CurrentPlayer.ID) return await message.reply('its not your turn') //if its not their turn
 
         let Arg = message.content.split(" ")[1] //property arg
         let Money = parseInt(message.content.split(" ")[message.content.split(" ").length - 1]) //get last arg
@@ -801,93 +798,93 @@ class Game {
             const CurrentProperty = this.Properties[i]
             if (CurrentProperty.Owner && CurrentProperty.Name.toLowerCase().includes(Arg.toLowerCase()) && CurrentProperty.Owner.ID == this.CurrentPlayer.ID) { //if theres an owner and name includes what was typed and the owner is the current player
                 if (FoundHouseIndex) { //if already found a house
-                    return await message.channel.send("you have to be more specific with the property name") //have to be more specific
+                    return await message.reply("you have to be more specific with the property name") //have to be more specific
                 } else {
                     FoundHouseIndex = i //set found house index
                 }
             }
         }
-        if (!FoundHouseIndex) return await message.channel.send("couldn't find that property") //if haven't found a house
+        if (!FoundHouseIndex) return await message.reply("couldn't find that property") //if haven't found a house
         if (this.Properties[FoundHouseIndex].Houses > 0) { //if theres more than one house on it
             this.CurrentPlayer.AddMoney(Math.round(this.Properties[FoundHouseIndex].Building / 2)); //sell the house for half the house cost
             this.Properties[FoundHouseIndex].Houses--; //remove house
-            await message.channel.send(`you sold 1 house for $${Math.round(this.Properties[FoundHouseIndex].Building / 2)} and now have ${this.Properties[FoundHouseIndex].Houses} ${(this.Properties[FoundHouseIndex].Houses == 1)?"house":"houses"} on it!`).then(async msg => await msg.react("🛑"))
+            await message.reply(`you sold 1 house for $${Math.round(this.Properties[FoundHouseIndex].Building / 2)} and now have ${this.Properties[FoundHouseIndex].Houses} ${(this.Properties[FoundHouseIndex].Houses == 1)?"house":"houses"} on it!`).then(async msg => await msg.react("🛑"))
         } else { //no houses
             if (!reciever) return await message.channel.send("!sell [property] [reciever] [amount]")
             reciever = this.Players.get(reciever.id) //get the player
-            if (!reciever) return await message.channel.send("invalid reciever!")
-            if (reciever == this.Players.get(message.author.id)) return await message.channel.send("You can't sell to yourself") //can't sell to yourself
+            if (!reciever) return await message.reply("invalid reciever!")
+            if (reciever == this.Players.get(message.author.id)) return await message.reply("you can't sell to yourself") //can't sell to yourself
             switch (this.Properties[FoundHouseIndex].Color) { //get all the houses in the color and make sure there are no houses
                 case "DARK_ORANGE":
                     if (this.Properties[1].Houses > 0) {
-                        return await message.channel.send(`you have to sell all the houses on ${this.Properties[1].Name} first!`)
+                        return await message.reply(`you have to sell all the houses on ${this.Properties[1].Name} first!`)
                     } else if (this.Properties[3].Houses > 0) {
-                        return await message.channel.send(`you have to sell all the houses on ${this.Properties[3].Name} first!`)
+                        return await message.reply(`you have to sell all the houses on ${this.Properties[3].Name} first!`)
                     }
                     break;
                 case "BLUE":
                     if (this.Properties[6].Houses > 0) {
-                        return await message.channel.send(`you have to sell all the houses on ${this.Properties[6].Name} first!`)
+                        return await message.reply(`you have to sell all the houses on ${this.Properties[6].Name} first!`)
                     } else if (this.Properties[8].Houses > 0) {
-                        return await message.channel.send(`you have to sell all the houses on ${this.Properties[8].Name} first!`)
+                        return await message.reply(`you have to sell all the houses on ${this.Properties[8].Name} first!`)
                     } else if (this.Properties[9].Houses > 0) {
-                        return await message.channel.send(`you have to sell all the houses on ${this.Properties[9].Name} first!`)
+                        return await message.reply(`you have to sell all the houses on ${this.Properties[9].Name} first!`)
                     }
                     break;
                 case "LUMINOUS_VIVID_PINK":
                     if (this.Properties[11].Houses > 0) {
-                        return await message.channel.send(`you have to sell all the houses on ${this.Properties[11].Name} first!`)
+                        return await message.reply(`you have to sell all the houses on ${this.Properties[11].Name} first!`)
                     } else if (this.Properties[13].Houses > 0) {
-                        return await message.channel.send(`you have to sell all the houses on ${this.Properties[13].Name} first!`)
+                        return await message.reply(`you have to sell all the houses on ${this.Properties[13].Name} first!`)
                     } else if (this.Properties[14].Houses > 0) {
-                        return await message.channel.send(`you have to sell all the houses on ${this.Properties[14].Name} first!`)
+                        return await message.reply(`you have to sell all the houses on ${this.Properties[14].Name} first!`)
                     }
                     break;
                 case "ORANGE":
                     if (this.Properties[16].Houses > 0) {
-                        return await message.channel.send(`you have to sell all the houses on ${this.Properties[16].Name} first!`)
+                        return await message.reply(`you have to sell all the houses on ${this.Properties[16].Name} first!`)
                     } else if (this.Properties[18].Houses > 0) {
-                        return await message.channel.send(`you have to sell all the houses on ${this.Properties[18].Name} first!`)
+                        return await message.reply(`you have to sell all the houses on ${this.Properties[18].Name} first!`)
                     } else if (this.Properties[19].Houses > 0) {
-                        return await message.channel.send(`you have to sell all the houses on ${this.Properties[19].Name} first!`)
+                        return await message.reply(`you have to sell all the houses on ${this.Properties[19].Name} first!`)
                     }
                     break;
                 case "DARK_RED":
                     if (this.Properties[21].Houses > 0) {
-                        return await message.channel.send(`you have to sell all the houses on ${this.Properties[21].Name} first!`)
+                        return await message.reply(`you have to sell all the houses on ${this.Properties[21].Name} first!`)
                     } else if (this.Properties[23].Houses > 0) {
-                        return await message.channel.send(`you have to sell all the houses on ${this.Properties[23].Name} first!`)
+                        return await message.reply(`you have to sell all the houses on ${this.Properties[23].Name} first!`)
                     } else if (this.Properties[24].Houses > 0) {
-                        return await message.channel.send(`you have to sell all the houses on ${this.Properties[24].Name} first!`)
+                        return await message.reply(`you have to sell all the houses on ${this.Properties[24].Name} first!`)
                     }
                     break;
                 case "GOLD":
                     if (this.Properties[26].Houses > 0) {
-                        return await message.channel.send(`you have to sell all the houses on ${this.Properties[26].Name} first!`)
+                        return await message.reply(`you have to sell all the houses on ${this.Properties[26].Name} first!`)
                     } else if (this.Properties[27].Houses > 0) {
-                        return await message.channel.send(`you have to sell all the houses on ${this.Properties[27].Name} first!`)
+                        return await message.reply(`you have to sell all the houses on ${this.Properties[27].Name} first!`)
                     } else if (this.Properties[29].Houses > 0) {
-                        return await message.channel.send(`you have to sell all the houses on ${this.Properties[29].Name} first!`)
+                        return await message.reply(`you have to sell all the houses on ${this.Properties[29].Name} first!`)
                     }
                     break;
                 case "DARK_GREEN":
                     if (this.Properties[31].Houses > 0) {
-                        return await message.channel.send(`you have to sell all the houses on ${this.Properties[31].Name} first!`)
+                        return await message.reply(`you have to sell all the houses on ${this.Properties[31].Name} first!`)
                     } else if (this.Properties[32].Houses > 0) {
-                        return await message.channel.send(`you have to sell all the houses on ${this.Properties[32].Name} first!`)
+                        return await message.reply(`you have to sell all the houses on ${this.Properties[32].Name} first!`)
                     } else if (this.Properties[34].Houses > 0) {
-                        return await message.channel.send(`you have to sell all the houses on ${this.Properties[34].Name} first!`)
+                        return await message.reply(`you have to sell all the houses on ${this.Properties[34].Name} first!`)
                     }
                     break;
                 case "DARK_BLUE":
                     if (this.Properties[37].Houses > 0) {
-                        return await message.channel.send(`you have to sell all the houses on ${this.Properties[37].Name} first!`)
+                        return await message.reply(`you have to sell all the houses on ${this.Properties[37].Name} first!`)
                     } else if (this.Properties[39].Houses > 0) {
-                        return await message.channel.send(`you have to sell all the houses on ${this.Properties[39].Name} first!`)
+                        return await message.reply(`you have to sell all the houses on ${this.Properties[39].Name} first!`)
                     }
                     break;
             }
-            if (reciever.CurrentOffer) return await message.channel.send("they have a pending offer already!") //if the reciever already has an offer
+            if (reciever.CurrentOffer) return await message.reply("they have a pending offer already!") //if the reciever already has an offer
             reciever.CurrentOffer = new Offer(FoundHouseIndex, Money, this.CurrentPlayer) //set offer to the new offer
             await message.channel.send(`<@${reciever.ID}>, <@${message.author.id}> has offered you ${this.Properties[FoundHouseIndex].Name} for $${Money}`).then(async msg => {
                 await msg.react("✔")
@@ -899,10 +896,10 @@ class Game {
     async Offer(message, args, user) { //accept or deny offers
         if (!user) {
             var userID = message.author.id
-            if (!this.InProgress) return await message.channel.send(`the game hasen't started yet!`) //if not in progress
-            if (!this.Players.has(userID)) return await message.channel.send("you aren't in the game!") //if they aren't in the game
+            if (!this.InProgress) return await message.channel.send(`<@${userID}>, the game hasen't started yet!`) //if not in progress
+            if (!this.Players.has(userID)) return await message.channel.send(`<@${userID}>, you aren't in the game!`) //if they aren't in the game
             var Player = this.Players.get(userID); //get the player
-            if (!Player.CurrentOffer) return await message.channel.send("you don't have a pending offer") //if they don't have a current offer
+            if (!Player.CurrentOffer) return await message.channel.send(`<@${userID}>, you don't have a pending offer`) //if they don't have a current offer
 
         } else {
             var userID = user.id
@@ -915,7 +912,7 @@ class Game {
         const Property = this.Properties[Player.CurrentOffer.PropertyIndex] //get the property offered
         if (Player.CurrentOffer.OriginalOwner.ID != Property.Owner.ID) { //If the property is no longer owned by the offerer
             Player.CurrentOffer = null; //remove offer
-            return await message.channel.send("someone already bought it!").then(async msg => await msg.react("🛑"))
+            return await message.channel.send(`<@${userID}>, someone already bought it!`).then(async msg => await msg.react("🛑"))
         }
         let answer = args[0]; //get the first arg
         if (!answer) return await message.channel.send(".offer [confirm|deny]") //if theres no answer or the answer isn't deny and there isn't an amount
@@ -924,114 +921,114 @@ class Game {
             Property.Buy(Player) //buy
             Player.RemoveMoney(message, Player.CurrentOffer.Price, this.Players.get(Player.CurrentOffer.OriginalOwner.ID)) //remove money
             this.Players.get(Player.CurrentOffer.OriginalOwner.ID).AddMoney(Player.CurrentOffer.Price) //add money
-            await message.channel.send(`you bought ${Property.Name} for $${Player.CurrentOffer.Price}`).then(async msg => await msg.react("🛑"));
+            await message.channel.send(`<@${userID}>, you bought ${Property.Name} for $${Player.CurrentOffer.Price}`).then(async msg => await msg.react("🛑"));
             Player.CurrentOffer = null; //remove offer
             return;
         } else if (answer == "deny") { //deny
             Player.CurrentOffer = null; //remove offer
-            return await message.channel.send(`denied.`)
+            return await message.channel.send(`Denied.`)
         } else { //neither comfirm or deny
             return await message.channel.send(`.offer [confirm|deny] {amount}`)
         }
     }
 
     async Mortgage(message) { //mortgage a property
-        if (!this.InProgress) return await message.channel.send("the game hasen't started yet!") //not in progress
-        if (message.author.id != this.CurrentPlayer.ID) return await message.channel.send('its not your turn') //not their turn
+        if (!this.InProgress) return await message.reply("the game hasen't started yet!") //not in progress
+        if (message.author.id != this.CurrentPlayer.ID) return await message.reply('its not your turn') //not their turn
 
         let Arg = message.content.split(" ")[1] //first arg
-        if (!Arg) return await message.channel.send("You must specify what property you want to mortgage!") //no first arg
+        if (!Arg) return await message.reply("you must specify what property you want to mortgage!") //no first arg
 
         let FoundHouseIndex;
         for (let i = 0; i < this.Properties.length; i++) { //go through all properties
             const CurrentProperty = this.Properties[i]
             if (CurrentProperty.Name.toLowerCase().includes(Arg.toLowerCase()) && CurrentProperty.Owner.ID == this.CurrentPlayer.ID) { //if property name includes arg and is owned
                 if (FoundHouseIndex) { //if already found house
-                    return await message.channel.send("you have to be more specific with the property name") //stop
+                    return await message.reply("you have to be more specific with the property name") //stop
                 } else { //not found one
                     FoundHouseIndex = i //set it to current index
                 }
             }
         }
 
-        if (!FoundHouseIndex) return await message.channel.send("couldn't find that property") //no index
+        if (!FoundHouseIndex) return await message.reply("couldn't find that property") //no index
         const FoundHouse = this.Properties[FoundHouseIndex] //get found house
-        if (FoundHouse.Mortgaged) return await message.channel.send("that is already mortgaged").then(async msg => await msg.react("🛑")) //if its already mortgaged
+        if (FoundHouse.Mortgaged) return await message.reply("that is already mortgaged").then(async msg => await msg.react("🛑")) //if its already mortgaged
 
         switch (FoundHouse.Color) { //have to sell houses on all properties of same color to mortgage
             case "DARK_ORANGE":
                 if (this.Properties[1].Houses > 0) {
-                    return await message.channel.send(`you have to sell all the houses on ${this.Properties[1].Name} first!`)
+                    return await message.reply(`you have to sell all the houses on ${this.Properties[1].Name} first!`)
                 } else if (this.Properties[3].Houses > 0) {
-                    return await message.channel.send(`you have to sell all the houses on ${this.Properties[3].Name} first!`)
+                    return await message.reply(`you have to sell all the houses on ${this.Properties[3].Name} first!`)
                 }
                 FoundHouse.Owner.DARK_ORANGE--;
                 break;
             case "BLUE":
                 if (this.Properties[6].Houses > 0) {
-                    return await message.channel.send(`you have to sell all the houses on ${this.Properties[6].Name} first!`)
+                    return await message.reply(`you have to sell all the houses on ${this.Properties[6].Name} first!`)
                 } else if (this.Properties[8].Houses > 0) {
-                    return await message.channel.send(`you have to sell all the houses on ${this.Properties[8].Name} first!`)
+                    return await message.reply(`you have to sell all the houses on ${this.Properties[8].Name} first!`)
                 } else if (this.Properties[9].Houses > 0) {
-                    return await message.channel.send(`you have to sell all the houses on ${this.Properties[9].Name} first!`)
+                    return await message.reply(`you have to sell all the houses on ${this.Properties[9].Name} first!`)
                 }
                 FoundHouse.Owner.BLUE--;
                 break;
             case "LUMINOUS_VIVID_PINK":
                 if (this.Properties[11].Houses > 0) {
-                    return await message.channel.send(`you have to sell all the houses on ${this.Properties[11].Name} first!`)
+                    return await message.reply(`you have to sell all the houses on ${this.Properties[11].Name} first!`)
                 } else if (this.Properties[13].Houses > 0) {
-                    return await message.channel.send(`you have to sell all the houses on ${this.Properties[13].Name} first!`)
+                    return await message.reply(`you have to sell all the houses on ${this.Properties[13].Name} first!`)
                 } else if (this.Properties[14].Houses > 0) {
-                    return await message.channel.send(`you have to sell all the houses on ${this.Properties[14].Name} first!`)
+                    return await message.reply(`you have to sell all the houses on ${this.Properties[14].Name} first!`)
                 }
                 FoundHouse.Owner.LUMINOUS_VIVID_PINK--;
                 break;
             case "ORANGE":
                 if (this.Properties[16].Houses > 0) {
-                    return await message.channel.send(`you have to sell all the houses on ${this.Properties[16].Name} first!`)
+                    return await message.reply(`you have to sell all the houses on ${this.Properties[16].Name} first!`)
                 } else if (this.Properties[18].Houses > 0) {
-                    return await message.channel.send(`you have to sell all the houses on ${this.Properties[18].Name} first!`)
+                    return await message.reply(`you have to sell all the houses on ${this.Properties[18].Name} first!`)
                 } else if (this.Properties[19].Houses > 0) {
-                    return await message.channel.send(`you have to sell all the houses on ${this.Properties[19].Name} first!`)
+                    return await message.reply(`you have to sell all the houses on ${this.Properties[19].Name} first!`)
                 }
                 FoundHouse.Owner.ORANGE--;
                 break;
             case "DARK_RED":
                 if (this.Properties[21].Houses > 0) {
-                    return await message.channel.send(`you have to sell all the houses on ${this.Properties[21].Name} first!`)
+                    return await message.reply(`you have to sell all the houses on ${this.Properties[21].Name} first!`)
                 } else if (this.Properties[23].Houses > 0) {
-                    return await message.channel.send(`you have to sell all the houses on ${this.Properties[23].Name} first!`)
+                    return await message.reply(`you have to sell all the houses on ${this.Properties[23].Name} first!`)
                 } else if (this.Properties[24].Houses > 0) {
-                    return await message.channel.send(`you have to sell all the houses on ${this.Properties[24].Name} first!`)
+                    return await message.reply(`you have to sell all the houses on ${this.Properties[24].Name} first!`)
                 }
                 FoundHouse.Owner.DARK_RED--;
                 break;
             case "GOLD":
                 if (this.Properties[26].Houses > 0) {
-                    return await message.channel.send(`you have to sell all the houses on ${this.Properties[26].Name} first!`)
+                    return await message.reply(`you have to sell all the houses on ${this.Properties[26].Name} first!`)
                 } else if (this.Properties[27].Houses > 0) {
-                    return await message.channel.send(`you have to sell all the houses on ${this.Properties[27].Name} first!`)
+                    return await message.reply(`you have to sell all the houses on ${this.Properties[27].Name} first!`)
                 } else if (this.Properties[29].Houses > 0) {
-                    return await message.channel.send(`you have to sell all the houses on ${this.Properties[29].Name} first!`)
+                    return await message.reply(`you have to sell all the houses on ${this.Properties[29].Name} first!`)
                 }
                 FoundHouse.Owner.GOLD--;
                 break;
             case "DARK_GREEN":
                 if (this.Properties[31].Houses > 0) {
-                    return await message.channel.send(`you have to sell all the houses on ${this.Properties[31].Name} first!`)
+                    return await message.reply(`you have to sell all the houses on ${this.Properties[31].Name} first!`)
                 } else if (this.Properties[32].Houses > 0) {
-                    return await message.channel.send(`you have to sell all the houses on ${this.Properties[32].Name} first!`)
+                    return await message.reply(`you have to sell all the houses on ${this.Properties[32].Name} first!`)
                 } else if (this.Properties[34].Houses > 0) {
-                    return await message.channel.send(`you have to sell all the houses on ${this.Properties[34].Name} first!`)
+                    return await message.reply(`you have to sell all the houses on ${this.Properties[34].Name} first!`)
                 }
                 FoundHouse.Owner.DARK_GREEN--;
                 break;
             case "DARK_BLUE":
                 if (this.Properties[37].Houses > 0) {
-                    return await message.channel.send(`you have to sell all the houses on ${this.Properties[37].Name} first!`)
+                    return await message.reply(`you have to sell all the houses on ${this.Properties[37].Name} first!`)
                 } else if (this.Properties[39].Houses > 0) {
-                    return await message.channel.send(`you have to sell all the houses on ${this.Properties[39].Name} first!`)
+                    return await message.reply(`you have to sell all the houses on ${this.Properties[39].Name} first!`)
                 }
                 FoundHouse.Owner.DARK_BLUE--;
                 break;
@@ -1039,45 +1036,45 @@ class Game {
 
         FoundHouse.Mortgaged = true; //mortgage
         FoundHouse.Owner.AddMoney(FoundHouse.Mortgage) //add money
-        await message.channel.send(`you mortgaged ${FoundHouse.Name} for $${FoundHouse.Mortgage}`).then(async msg => await msg.react("🛑"))
+        await message.reply(`you mortgaged ${FoundHouse.Name} for $${FoundHouse.Mortgage}`).then(async msg => await msg.react("🛑"))
     }
 
     async Unmortgage(message) { //unmortage a house
-        if (!this.InProgress) return await message.channel.send("the game hasen't started yet!") //has to be in progress
-        if (message.author.id != this.CurrentPlayer.ID) return await message.channel.send('its not your turn') //if its not their turn
+        if (!this.InProgress) return await message.reply("the game hasen't started yet!") //has to be in progress
+        if (message.author.id != this.CurrentPlayer.ID) return await message.reply('its not your turn') //if its not their turn
 
         let Arg = message.content.split(" ")[1] //get property
-        if (!Arg) return await message.channel.send("You must specify what property you want to unmortgage!")
+        if (!Arg) return await message.reply("you must specify what property you want to unmortgage!")
 
         let FoundHouseIndex;
         for (let i = 0; i < this.Properties.length; i++) { //find it
             const CurrentProperty = this.Properties[i]
             if (CurrentProperty.Name.toLowerCase().includes(Arg.toLowerCase()) && CurrentProperty.Owner.ID == this.CurrentPlayer.ID) {
                 if (FoundHouseIndex) {
-                    return await message.channel.send("you have to be more specific with the property name")
+                    return await message.reply("you have to be more specific with the property name")
                 } else {
                     FoundHouseIndex = i
                 }
             }
         }
-        if (!FoundHouseIndex) return await message.channel.send("couldn't find that property")
+        if (!FoundHouseIndex) return await message.reply("couldn't find that property")
         const FoundHouse = this.Properties[FoundHouseIndex]
-        if (!FoundHouse.Mortgaged) return await message.channel.send("that isn't mortgaged") //if it isn't mortgaged
+        if (!FoundHouse.Mortgaged) return await message.reply("that isn't mortgaged") //if it isn't mortgaged
         const Price = FoundHouse.Mortgage * 1.10; //the price to unmortgage is 110% the mortgage cost
 
-        if (Price > this.CurrentPlayer.Money) return await message.channel.send(`you don't have enough money to unmortgage it for $${Price}.`).then(async msg => await msg.react("🛑")) //if its over their price
+        if (Price > this.CurrentPlayer.Money) return await message.reply(`you don't have enough money to unmortgage it for $${Price}.`).then(async msg => await msg.react("🛑")) //if its over their price
         FoundHouse.Owner[FoundHouse.Color]++; //increase amount for color
 
         this.CurrentPlayer.RemoveMoney(message, Price, null) //pay for it
 
         FoundHouse.Mortgaged = false; //unmortgage
 
-        await message.channel.send(`bought back ${FoundHouse.Name} for $${Price}`).then(async msg => await msg.react("🛑"))
+        await message.reply(`you bought back ${FoundHouse.Name} for $${Price}`).then(async msg => await msg.react("🛑"))
     }
 
     async GetProperty(message) { //get properties owned
-        if (!this.InProgress) return await message.channel.send("The game hasen't started yet!")
-        if (!this.Players.has(message.author.id)) return await message.channel.send("You aren't in this game")
+        if (!this.InProgress) return await message.reply("the game hasen't started yet!")
+        if (!this.Players.has(message.author.id)) return await message.reply("you aren't in this game")
 
         const Player = this.Players.get(message.author.id)
         const PropertyEmbed = new Discord.RichEmbed()
@@ -1158,7 +1155,7 @@ bot.on("message", async (message) => {
                 if (!bot.games.has(message.channel.id)) { //if there isn't a game
                     await bot.games.set(message.channel.id, new Game(message)) //make a new game
                 } else { //there is a game
-                    await message.channel.send("theres already a game in this channel!")
+                    await message.reply("theres already a game in this channel!")
                 }
                 break;
             case "stop": //stop
@@ -1167,113 +1164,113 @@ bot.on("message", async (message) => {
                         await bot.games.delete(message.channel.id) //delete
                         await message.channel.send("Game is over") //games done
                     } else { //not the leader
-                        await message.channel.send("only the leader can end this game.")
+                        await message.reply("only the leader can end this game.")
                     }
                 } else { //no game
-                    await message.channel.send(`there is no game in this channel. Do ${prefix}create to make a game`)
+                    await message.reply(`there is no game in this channel. Do ${prefix}create to make a game`)
                 }
                 break;
             case "join": //join game
                 if (!bot.games.has(message.channel.id)) { //if no game
-                    await message.channel.send(`there is no game in this channel. Do ${prefix}create to make a game`)
+                    await message.reply(`there is no game in this channel. Do ${prefix}create to make a game`)
                 } else { //there is a game
                     bot.games.get(message.channel.id).NewPlayer(message)
                 }
                 break;
             case "leave": //leave game
                 if (!bot.games.has(message.channel.id)) { //if no game
-                    await message.channel.send(`there is no game in this channel. Do ${prefix}create to make a game`)
+                    await message.reply(`there is no game in this channel. Do ${prefix}create to make a game`)
                 } else { // there is a game
                     bot.games.get(message.channel.id).PlayerLeave(message)
                 }
                 break;
             case "start": //start game
                 if (!bot.games.has(message.channel.id)) { //if no game
-                    await message.channel.send(`there is no game in this channel. Do ${prefix}create to make a game`)
+                    await message.reply(`there is no game in this channel. Do ${prefix}create to make a game`)
                 } else { //if game
                     bot.games.get(message.channel.id).Start(message)
                 }
                 break;
             case "leader": //change leader
                 if (!bot.games.has(message.channel.id)) { //if no game
-                    await message.channel.send(`there is no game in this channel. Do ${prefix}create to make a game`)
+                    await message.reply(`there is no game in this channel. Do ${prefix}create to make a game`)
                 } else { //if game
                     bot.games.get(message.channel.id).ChangeLeader(message)
                 }
                 break;
             case "roll": //roll the dice
                 if (!bot.games.has(message.channel.id)) { //if no game
-                    await message.channel.send(`there is no game in this channel. Do ${prefix}create to make a game`)
+                    await message.reply(`there is no game in this channel. Do ${prefix}create to make a game`)
                 } else { //if game
                     bot.games.get(message.channel.id).Roll(message)
                 }
                 break;
             case "stats": //get player stats
                 if (!bot.games.has(message.channel.id)) { //if no game
-                    await message.channel.send(`there is no game in this channel. Do ${prefix}create to make a game`)
+                    await message.reply(`there is no game in this channel. Do ${prefix}create to make a game`)
                 } else { //if game
                     bot.games.get(message.channel.id).Stats(message)
                 }
                 break;
             case "buy": //buy property
                 if (!bot.games.has(message.channel.id)) { //if no game
-                    await message.channel.send(`there is no game in this channel. Do ${prefix}create to make a game`)
+                    await message.reply(`there is no game in this channel. Do ${prefix}create to make a game`)
                 } else { //if game
                     bot.games.get(message.channel.id).Buy(message)
                 }
                 break;
             case "end": //end your turn
                 if (!bot.games.has(message.channel.id)) { //if there is no game
-                    await message.channel.send(`there is no game in this channel. Do ${prefix}create to make a game`)
+                    await message.reply(`there is no game in this channel. Do ${prefix}create to make a game`)
                 } else { //if game
                     bot.games.get(message.channel.id).End(message) //end
                 }
                 break;
             case "bid": //bid
                 if (!bot.games.has(message.channel.id)) { //if no game
-                    await message.channel.send(`there is no game in this channel. Do ${prefix}create to make a game`)
+                    await message.reply(`there is no game in this channel. Do ${prefix}create to make a game`)
                 } else { //if game
                     bot.games.get(message.channel.id).Auction(message, args)
                 }
                 break;
             case "house": //buy a house
                 if (!bot.games.has(message.channel.id)) { //if no game
-                    await message.channel.send(`there is no game in this channel. Do ${prefix}create to make a game`)
+                    await message.reply(`there is no game in this channel. Do ${prefix}create to make a game`)
                 } else { //if game
                     bot.games.get(message.channel.id).BuyProperty(message)
                 }
                 break;
             case "sell": //sell houses or property to other players
                 if (!bot.games.has(message.channel.id)) { //if no game
-                    await message.channel.send(`there is no game in this channel. Do ${prefix}create to make a game`)
+                    await message.reply(`there is no game in this channel. Do ${prefix}create to make a game`)
                 } else { //if game
                     bot.games.get(message.channel.id).Sell(message)
                 }
                 break;
             case "offer": //accept or deny an offer
                 if (!bot.games.has(message.channel.id)) { //if no game
-                    await message.channel.send(`there is no game in this channel. Do ${prefix}create to make a game`)
+                    await message.reply(`there is no game in this channel. Do ${prefix}create to make a game`)
                 } else { //if game
                     bot.games.get(message.channel.id).Offer(message, args)
                 }
                 break;
             case "mortgage": //mortgage a house
                 if (!bot.games.has(message.channel.id)) { //if no game
-                    await message.channel.send(`there is no game in this channel. Do ${prefix}create to make a game`)
+                    await message.reply(`there is no game in this channel. Do ${prefix}create to make a game`)
                 } else { //if game
                     bot.games.get(message.channel.id).Mortgage(message)
                 }
                 break;
             case "unmortgage": //unmortgage a house
                 if (!bot.games.has(message.channel.id)) { //if no game
-                    await message.channel.send(`there is no game in this channel. Do ${prefix}create to make a game`)
+                    await message.reply(`there is no game in this channel. Do ${prefix}create to make a game`)
                 } else { //if game
                     bot.games.get(message.channel.id).Unmortgage(message)
                 }
                 break;
             case "property": //view purchased property
                 if (!bot.games.has(message.channel.id)) { //if no game
-                    await message.channel.send(`there is no game in this channel. Do ${prefix}create to make a game`)
+                    await message.reply(`there is no game in this channel. Do ${prefix}create to make a game`)
                 } else { //if game
                     bot.games.get(message.channel.id).GetProperty(message)
                 }

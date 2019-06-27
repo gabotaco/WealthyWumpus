@@ -73,29 +73,12 @@ class Property { //Make a property
             .setColor(this.Color)
             .setTitle(this.Name)
             .addField("Price", this.Price, true)
-            .addField("Mortgage", this.Mortgage, true)
-        if (this.Color != "Utility" && this.Color != "RR") {
-            PropertyEmbed.addField("Price per building", this.Building, true)
-        } else {
+        if (this.Color == "Utility" || this.Color == "RR") {
             PropertyEmbed.setColor("RANDOM")
         }
 
         if (this.Image) PropertyEmbed.setImage(this.Image)
-        if (typeof (this.Rent) != Number) { //If the rent is an array and not a Number (0)
-            for (let i = 0; i < this.Rent.length; i++) { //go through all the rent
-                if (i == 5) { //if theres 5 then its a property with hotels
-                    PropertyEmbed.addField("1 Hotel", this.Rent[i], true)
-                } else { //not 5
-                    if (this.Color == "RR") { //railroad
-                        if (i != 0) PropertyEmbed.addField("Rent with " + i + ` ${(i == 1)?"RR":"RR's"}`, this.Rent[i], true) //Rent with _ railroads
-                    } else if (this.Color == "Utility") { //Utility
-                        if (i != 0) PropertyEmbed.addField("Rent with " + i + ` ${(i == 1)?"Utility":"Utilities"}`, this.Rent[i] + " * dice roll", true) //rent with _ utility * dice roll
-                    } else {
-                        PropertyEmbed.addField("Rent with " + i + ` ${(i == 1)?"House":"Houses"}`, this.Rent[i], true) //Then its a house and add the house
-                    }
-                }
-            }
-        }
+
         return PropertyEmbed;
     }
 }
@@ -154,7 +137,6 @@ class Player {
                 this.Position -= Properties.length; //move them back onto the board
                 await message.channel.send("you passed go!") //inform
             }
-            this.Position = 11;
             resolve();
         })
     }
@@ -528,7 +510,7 @@ class Game {
                         this.CurrentPlayer.Free(); //free
                         await this.CurrentPlayer.Move(message, Dice1 + Dice2, this.Properties) //move
                     } else { //been in jail for less than 3 turns
-                        await message.channel.send("You are in jail and cannot move!").then(async msg => await msg.react("🛑")) //can't move
+                        await message.channel.send(`You rolled a ${Dice1} and a ${Dice2} but you are in jail and cannot move!`).then(async msg => await msg.react("🛑")) //can't move
                     }
 
                 }
@@ -742,7 +724,7 @@ class Game {
         let PropertyIndex; //null at first
         for (let i = 0; i < this.Properties.length; i++) { //go through all propertys
             const CurrentProperty = this.Properties[i]
-            if (CurrentProperty.Owner && CurrentProperty.Houses < LeastHouses && CurrentProperty.Owner.ID == this.CurrentPlayer.ID) { //if there is an owner, it has the least num of houses and the owner is the player
+            if (CurrentProperty.Owner && CurrentProperty.Houses < LeastHouses && CurrentProperty.Owner.ID == this.CurrentPlayer.ID && CurrentProperty.Color != "RR" && CurrentProperty.Color != "Utility") { //if there is an owner, it has the least num of houses and the owner is the player
                 if (CurrentProperty.Color == "DARK_ORANGE" || CurrentProperty.Color == "DARK_BLUE") {
                     if (CurrentProperty.Owner[CurrentProperty.Color] == 2) { //owns all 2
                         LeastHouses = CurrentProperty.Houses; //set least houses

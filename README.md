@@ -15,7 +15,7 @@
   <a href="">Hell yeah </a>
 </p>
 
-<img src="https://i.imgur.com/3slzIe4.png" align="center">
+<img align="center" src="https://i.imgur.com/3slzIe4.png">
 
 ## Table of content
 

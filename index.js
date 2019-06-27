@@ -195,7 +195,7 @@ class Game {
             /* 11 */
             new Property("Summoners Rift (Pink)", [10, 50, 150, 450, 625, 750], "LUMINOUS_VIVID_PINK", 140, 70, 100, "https://cdn.discordapp.com/attachments/593554477844529152/593598475942232074/SummonersRift.png"),
             /* 12 */
-            new Property("Server Room", [0, 4, 10], "Utility", 150, 75, 0),
+            new Property("Server Room", [0, 4, 10], "Utility", 150, 75, 0, "https://cdn.discordapp.com/attachments/593554477844529152/593842980247568386/ServerRoom.png"),
             /* 13 */
             new Property("Peaches Castle (Pink)", [10, 50, 150, 450, 625, 750], "LUMINOUS_VIVID_PINK", 140, 70, 100, "https://cdn.discordapp.com/attachments/593554477844529152/593599035978547204/PeachsCastle.png"),
             /* 14 */
@@ -217,7 +217,7 @@ class Game {
             /* 22 */
             new Property("Chance", 0, "Chance"),
             /* 23 */
-            new Property("Indiana Avenue (Red)", [18, 90, 250, 700, 875, 1050], "DARK_RED", 220, 110, 150),
+            new Property("Lethal Lava Land (Red)", [18, 90, 250, 700, 875, 1050], "DARK_RED", 220, 110, 150, "https://cdn.discordapp.com/attachments/593554477844529152/593839802978140170/LethalLavaLand.png"),
             /* 24 */
             new Property("Hell (Red)", [20, 100, 300, 750, 925, 1100], "DARK_RED", 240, 120, 150, "https://cdn.discordapp.com/attachments/593554477844529152/593603708009447444/Hell.png"),
             /* 25 */
@@ -227,7 +227,7 @@ class Game {
             /* 27 */
             new Property("Victory Road (Yellow)", [22, 110, 330, 800, 975, 1150], "GOLD", 260, 130, 150, "https://cdn.discordapp.com/attachments/593554477844529152/593605935872737290/VictoryRoad.png"),
             /* 28 */
-            new Property("Water Works", [0, 4, 10], "Utility", 150, 75, 0),
+            new Property("Service Provider", [0, 4, 10], "Utility", 150, 75, 0, "https://cdn.discordapp.com/attachments/593554477844529152/593843119427026953/ServiceProvider.png"),
             /* 29 */
             new Property("Nuketown (Yellow)", [24, 120, 360, 850, 1025, 1200], "GOLD", 280, 140, 150, "https://cdn.discordapp.com/attachments/593554477844529152/593606660174512138/Nuketown.png"),
             /* 30 */
@@ -314,7 +314,10 @@ class Game {
         this.CurrentPlayerIndex = Math.floor(Math.random() * this.Players.size) //pick random starting player
         this.CurrentPlayer = this.Players.array()[this.CurrentPlayerIndex] //set currentplayer
 
-        await message.channel.send(`Lets get the show on the road! <@${this.CurrentPlayer.ID}>, you are going first! Do ${botconfig.prefixes[message.guild.id].prefix}roll to roll!`).then(async msg => {await msg.react("🎲"); await msg.react("🏠")}) //inform
+        await message.channel.send(`Lets get the show on the road! <@${this.CurrentPlayer.ID}>, you are going first! Do ${botconfig.prefixes[message.guild.id].prefix}roll to roll!`).then(async msg => {
+            await msg.react("🎲");
+            await msg.react("🏠")
+        }) //inform
     }
 
     async HandlePosition(message, userID, Dice1, Dice2) { //handle them being in a position
@@ -645,16 +648,26 @@ class Game {
             this.HighestBid = 0 //highest bid of 0
             this.Bidders = this.Players.concat().array() //put all players into an array that copys the players
             this.BiddersIndex = this.CurrentPlayerIndex; //Start off with the current player
-            await message.channel.send(`Let the bidding begin! <@${this.Bidders[this.BiddersIndex].ID}> type !bid [amount] to place a bid or type !bid quit to back out. (Current bid is $${this.HighestBid})`).then(async msg => {await msg.react("❌"); await msg.react("⬆"); await msg.react("⏫")}) //start bid
+            await message.channel.send(`Let the bidding begin! <@${this.Bidders[this.BiddersIndex].ID}> type !bid [amount] to place a bid or type !bid quit to back out. (Current bid is $${this.HighestBid})`).then(async msg => {
+                await msg.react("❌");
+                await msg.react("⬆");
+                await msg.react("⏫")
+            }) //start bid
         } else { //if bought or can't be bought
             this.CurrentPlayer.Rolled = false; //reset rolled
             if (this.CurrentPlayer.Doubles && this.CurrentPlayer.Money >= 0) { //if its doubles and they didn't go bankrupt
-                await message.channel.send("Roll again!").then(async msg => {await msg.react("🎲"); await msg.react("🏠")})
+                await message.channel.send("Roll again!").then(async msg => {
+                    await msg.react("🎲");
+                    await msg.react("🏠")
+                })
             } else { //if it wasn't doubles or they went bankrupt
                 this.CurrentPlayerIndex++; //next player
                 if (this.CurrentPlayerIndex >= this.Players.size) this.CurrentPlayerIndex = 0; //if past the last player reset to first
                 this.CurrentPlayer = this.Players.array()[this.CurrentPlayerIndex] //get current player
-                await message.channel.send(`<@${this.CurrentPlayer.ID}> it's your turn! You have $${this.CurrentPlayer.Money}`).then(async msg => {await msg.react("🎲"); await msg.react("🏠")})
+                await message.channel.send(`<@${this.CurrentPlayer.ID}> it's your turn! You have $${this.CurrentPlayer.Money}`).then(async msg => {
+                    await msg.react("🎲");
+                    await msg.react("🏠")
+                })
             }
         }
     }
@@ -686,16 +699,26 @@ class Game {
                 CurrentProperty.Buy(winner) //buy it
                 this.CurrentPlayer.Rolled = false; //set rolled to false
                 if (this.CurrentPlayer.Doubles) { //if they rolled doubles
-                    await message.channel.send(`<@${this.CurrentPlayer.ID}> roll again!`).then(async msg => {await msg.react("🎲"); await msg.react("🏠")})
+                    await message.channel.send(`<@${this.CurrentPlayer.ID}> roll again!`).then(async msg => {
+                        await msg.react("🎲");
+                        await msg.react("🏠")
+                    })
                 } else { //didn't roll doubles
                     this.CurrentPlayerIndex++;
                     if (this.CurrentPlayerIndex >= this.Players.size) this.CurrentPlayerIndex = 0; //reset to 0
                     this.CurrentPlayer = this.Players.array()[this.CurrentPlayerIndex]
-                    await message.channel.send(`<@${this.CurrentPlayer.ID}> it's your turn!`).then(async msg => {await msg.react("🎲"); await msg.react("🏠")})
+                    await message.channel.send(`<@${this.CurrentPlayer.ID}> it's your turn!`).then(async msg => {
+                        await msg.react("🎲");
+                        await msg.react("🏠")
+                    })
                 }
             } else { //still more than 1 bidder
                 if (this.BiddersIndex >= this.Bidders.length) this.BiddersIndex = 0; //go to next bidder
-                await message.channel.send(`<@${this.Bidders[this.BiddersIndex].ID}> its your turn to bid! (Current bid is $${this.HighestBid})`).then(async msg => {await msg.react("❌"); await msg.react("⬆"); await msg.react("⏫")})
+                await message.channel.send(`<@${this.Bidders[this.BiddersIndex].ID}> its your turn to bid! (Current bid is $${this.HighestBid})`).then(async msg => {
+                    await msg.react("❌");
+                    await msg.react("⬆");
+                    await msg.react("⏫")
+                })
             }
         } else { //didn't quit
             amount = parseInt(amount) //convert to int
@@ -705,7 +728,11 @@ class Game {
             this.HighestBid = amount; //set highest bid
             this.BiddersIndex++; //next bidder
             if (this.BiddersIndex >= this.Bidders.length) this.BiddersIndex = 0;
-            await message.channel.send(`<@${this.Bidders[this.BiddersIndex].ID}> its your turn to bid! (Current bid is $${this.HighestBid})`).then(async msg => {await msg.react("❌"); await msg.react("⬆"); await msg.react("⏫")})
+            await message.channel.send(`<@${this.Bidders[this.BiddersIndex].ID}> its your turn to bid! (Current bid is $${this.HighestBid})`).then(async msg => {
+                await msg.react("❌");
+                await msg.react("⬆");
+                await msg.react("⏫")
+            })
         }
     }
 
@@ -848,35 +875,44 @@ class Game {
             }
             if (reciever.CurrentOffer) return await message.channel.send("they have a pending offer already!") //if the reciever already has an offer
             reciever.CurrentOffer = new Offer(FoundHouseIndex, Money, this.CurrentPlayer) //set offer to the new offer
-            await message.channel.send(`<@${reciever.ID}>, <@${message.author.id}> has offered you ${this.Properties[FoundHouseIndex].Name} for $${Money}`)
+            await message.channel.send(`<@${reciever.ID}>, <@${message.author.id}> has offered you ${this.Properties[FoundHouseIndex].Name} for $${Money}`).then(async msg => {
+                await msg.react("✔")
+                await msg.react("✖")
+            })
         }
     }
 
-    async Offer(message) { //accept or deny offers
-        if (!this.InProgress) return await message.channel.send(`the game hasen't started yet!`) //if not in progress
-        if (!this.Players.has(message.author.id)) return await message.channel.send("you aren't in the game!") //if they aren't in the game
-        const Player = this.Players.get(message.author.id); //get the player
-        if (!Player.CurrentOffer) return await message.channel.send("you don't have a pending offer") //if they don't have a current offer
+    async Offer(message, args, user) { //accept or deny offers
+        if (!user) {
+            var userID = message.author.id
+            if (!this.InProgress) return await message.channel.send(`the game hasen't started yet!`) //if not in progress
+            if (!this.Players.has(userID)) return await message.channel.send("you aren't in the game!") //if they aren't in the game
+            var Player = this.Players.get(userID); //get the player
+            if (!Player.CurrentOffer) return await message.channel.send("you don't have a pending offer") //if they don't have a current offer
+
+        } else {
+            var userID = user.id
+            if (!this.InProgress) return;
+            if (!this.Players.has(userID)) return;
+            var Player = this.Players.get(userID); //get the player
+            if (!Player.CurrentOffer) return;
+
+        }
         const Property = this.Properties[Player.CurrentOffer.PropertyIndex] //get the property offered
         if (Player.CurrentOffer.OriginalOwner.ID != Property.Owner.ID) { //If the property is no longer owned by the offerer
             Player.CurrentOffer = null; //remove offer
-            return await message.channel.send("someone already bought it!")
+            return await message.channel.send("someone already bought it!").then(async msg => await msg.react("🛑"))
         }
-        let answer = message.content.split(" ")[1]; //get the first arg
-        let amount = parseInt(message.content.split(" ")[2]); //second arg
-        if ((!answer) || (answer != "deny" && !amount)) return await message.channel.send(".offer [confirm|deny] [amount]") //if theres no answer or the answer isn't deny and there isn't an amount
+        let answer = args[0]; //get the first arg
+        if (!answer) return await message.channel.send(".offer [confirm|deny]") //if theres no answer or the answer isn't deny and there isn't an amount
         answer = answer.toLowerCase(); //change to lower case
         if (answer == "confirm") { //if they confirm
-            if (amount == Player.CurrentOffer.Price) { //if the amount is the same as the offered price
-                Property.Buy(Player) //buy
-                Player.RemoveMoney(message, Player.CurrentOffer.Price, this.Players.get(Player.CurrentOffer.OriginalOwner.ID)) //remove money
-                this.Players.get(Player.CurrentOffer.OriginalOwner.ID).AddMoney(Player.CurrentOffer.Price) //add money
-                await message.channel.send(`you bought ${Property.Name} for $${Player.CurrentOffer.Price}`);
-                Player.CurrentOffer = null; //remove offer
-                return;
-            } else { //not the same
-                return await message.channel.send(`the price is $${Player.CurrentOffer.Price}. Either .offer confirm ${Player.CurrentOffer.Price} or .offer deny`)
-            }
+            Property.Buy(Player) //buy
+            Player.RemoveMoney(message, Player.CurrentOffer.Price, this.Players.get(Player.CurrentOffer.OriginalOwner.ID)) //remove money
+            this.Players.get(Player.CurrentOffer.OriginalOwner.ID).AddMoney(Player.CurrentOffer.Price) //add money
+            await message.channel.send(`you bought ${Property.Name} for $${Player.CurrentOffer.Price}`).then(async msg => await msg.react("🛑"));
+            Player.CurrentOffer = null; //remove offer
+            return;
         } else if (answer == "deny") { //deny
             Player.CurrentOffer = null; //remove offer
             return await message.channel.send(`denied.`)
@@ -1087,12 +1123,12 @@ bot.on("message", async (message) => {
                     .addField(`${prefix}stats`, "Get information about yourself", true)
                     .addField(`${prefix}buy`, "Buy the property you are currently on", true)
                     .addField(`${prefix}end`, "Ends your turn", true)
-                    .addField(`${prefix}bid`, "Bid for the auction", true)
+                    .addField(`${prefix}bid [amount|stop]`, "Bid for the auction", true)
                     .addField(`${prefix}house`, "Buy houses", true)
-                    .addField(`${prefix}sell [property] [reciever] [cost]`, "Sell property and houses (if theres a house no need to provide a reciever)", true)
-                    .addField(`${prefix}offer`, "Accept or deny an offer from another player", true)
-                    .addField(`${prefix}mortgage`, "Put property up for mortgage", true)
-                    .addField(`${prefix}unmortgage`, "Rebuy property", true)
+                    .addField(`${prefix}sell [property] {reciever} {cost}`, "Sell property and houses (if theres a house no need to provide a reciever)", true)
+                    .addField(`${prefix}offer [confirm|deny]`, "Accept or deny an offer from another player", true)
+                    .addField(`${prefix}mortgage [property]`, "Put property up for mortgage", true)
+                    .addField(`${prefix}unmortgage [property]`, "Rebuy property", true)
                     .addField(`${prefix}property`, "View all your owned properties and how many houses are on them", true)
                 await message.channel.send(HelpEmbed)
                 break;
@@ -1204,7 +1240,7 @@ bot.on("message", async (message) => {
                 if (!bot.games.has(message.channel.id)) { //if no game
                     await message.channel.send(`there is no game in this channel. Do ${prefix}create to make a game`)
                 } else { //if game
-                    bot.games.get(message.channel.id).Offer(message)
+                    bot.games.get(message.channel.id).Offer(message, args)
                 }
                 break;
             case "mortgage": //mortgage a house
@@ -1267,6 +1303,12 @@ bot.on("messageReactionAdd", async (messageReaction, user) => {
             break;
         case "🏠":
             if (bot.games.has(messageReaction.message.channel.id)) bot.games.get(messageReaction.message.channel.id).BuyProperty(messageReaction.message, user);
+            break;
+        case "✔":
+            if (bot.games.has(messageReaction.message.channel.id)) bot.games.get(messageReaction.message.channel.id).Offer(messageReaction.message, ["confirm"], user)
+            break;
+        case "✖":
+            if (bot.games.has(messageReaction.message.channel.id)) bot.games.get(messageReaction.message.channel.id).Offer(messageReaction.message, ["deny"], user)
             break;
     }
 })

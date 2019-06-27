@@ -20,18 +20,20 @@
 
 <div align="center"> <img src="https://i.imgur.com/3slzIe4.png" width="100%"> </div>
 
-## Key Features
+# Key Features
 
 * Easily Custamizable
-  - Add properties
-  - Add Community Chest and Chance cards
+  - Add and change properties
+  - Add and change Community Chest and Chance cards
 * Object Oriented
 * Flexible
 * Easy to Play
     - Use message reactions instead of typing commands
 * Light Weight
+* Incorporates 99% of rules from the original game
+* Quick and fun to play
 
-## Commands
+# Commands
 
 Some commands have reactions to make it easier to play but heres the list of all commands:
 
@@ -57,11 +59,13 @@ Some commands have reactions to make it easier to play but heres the list of all
 |!unmortgage [property]  | **Unmortgage a property**|❌|
 |!property  | **Get a list of all owned propertys and how many hosues are on it**|❌|
 
-## How to Play
+# How to Play
 
 The game follows all original Monopoly rules found [here](https://www.hasbro.com/common/instruct/monins.pdf). 
 
 The only change made for this bot is that when the player goes bankrupt to the bank (tax or card) the property is not auctioned off, it is instead put back up on the market for anyone to buy when they land on it.
+
+## Steps
 
 1. To start, invite the bot to your server and make sure it has permission to send messages and read channels.
 2. Pick a channel and do `!create` to make a game.
@@ -77,25 +81,25 @@ The only change made for this bot is that when the player goes bankrupt to the b
 7. After you are finished with your command you can react with 🛑 to move on to the next player.
 8. Repeat until someone goes bankrupt.
 
-### Auctions
+## Auctions
 
 When property is put up for auction, the player who landed on it begins the auction. Property starts at $0 during an auction and the first player has to bid at least $1. You have 4 options for bidding. You can either do `!bid [amount]` to bid a custom amount or you can react with the 3 emojis. ❌ will take you out of the auction, ⬆ will raise the current bid by $10, and ⏫ will raise the current bid by $100. The auction is over when there is only 1 person left.  
 
-### Jail
+## Jail
 
 A player can go to jail in 3 ways. Either by getting a card that sends them to jail, landing on the go to jail tile or by rolling doubles 3 times in a row. While in jail the player can still collect rent and can bid on property and accept offers. There are 3 ways a player can get out of jail. Either by having a get out of jail free card (will be used the first turn if you don't roll doubles), by rolling doubles or if you don't roll doubles after 3 turns you will pay $50 dollars and get out of jail.
 
-### Selling Property
+## Selling Property
 
 To offer property to another player you must sell all houses in that color group (it will tell you if you need to). To sell houses do `!sell [property]` (you don't need to specify a person or amount). Once there are no more houses on that color group you can do `!sell [property] [person] [amount]` to offer it to another player. When you offer to the player the bot will notify them and the player can react with ✔ to accept it and pay you for it or ✖ to deny it. They must deny it before they can recieve another offer. 
 
-## Screenshots
+# Screenshots
 
 <img src="https://cdn.discordapp.com/attachments/593554477844529152/593833508619681809/unknown.png">
 
 <img src="https://cdn.discordapp.com/attachments/593554477844529152/593836054075932685/Capture.PNG">
 
-## Installation
+# Installation
 
 To clone and run this bot, you'll need [Git](https://git-scm.com) and [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) installed on your computer. From your command line:
 
@@ -118,7 +122,7 @@ Inside the repository create botconfig.json and it should look something like th
 ```
 Note: prefixes will be filled in for you when it joins a new guild.
 
-## Credits
+# Credits
 Close friends who made this possible.
 
 |Profile   | Tag           | Role  |
@@ -128,6 +132,6 @@ Close friends who made this possible.
 | <img src="https://cdn.discordapp.com/attachments/593554477844529152/593814327153393664/Capture.png" width="43"> | Solid2Hours#0069| Idea Man |
 | <img src="https://cdn.discordapp.com/attachments/593554477844529152/593824317721280513/Capture.png" width="43"> | halleyman7#4111 | Idea Man #2 |
 
-## License
+# License
 
 MIT

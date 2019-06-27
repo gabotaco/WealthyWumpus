@@ -133,8 +133,8 @@ Close friends who made this possible.
 | ------------- |:-------------:| -----:|
 | <img src="https://cdn.discordapp.com/attachments/593554477844529152/593808300647251978/Capture.png" width="43"> | Gabo#1234 | Programmer |
 | <img src="https://cdn.discordapp.com/attachments/593554477844529152/593824646378553353/Capture.png" width="43">      | spoodermank#7336| Graphic Designer |
-| <img src="https://cdn.discordapp.com/attachments/593554477844529152/593814327153393664/Capture.png" width="43"> | Solid2Hours#0069| Idea Man |
-| <img src="https://cdn.discordapp.com/attachments/593554477844529152/593824317721280513/Capture.png" width="43"> | halleyman7#4111 | Idea Man #2 |
+| <img src="https://cdn.discordapp.com/attachments/593554477844529152/593814327153393664/Capture.png" width="43"> | Solid2Hours#0069| Creative Director |
+| <img src="https://cdn.discordapp.com/attachments/593554477844529152/593824317721280513/Capture.png" width="43"> | halleyman7#4111 | Creative Director #2 |
 
 # License
 

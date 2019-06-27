@@ -18,7 +18,7 @@
   <a href="#license">License</a>
 </p>
 
-<div align="center"> <img src="https://i.imgur.com/3slzIe4.png" width="100%"> </div>
+<div align="center"> <img src="https://cdn-images-1.medium.com/max/2600/1*lh6NS8hx0pu5mlZeSqnu5w.jpeg" width="100%"> </div>
 
 # Key Features
 

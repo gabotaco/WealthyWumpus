@@ -73,7 +73,7 @@ The only change made for this bot is that when the player goes bankrupt to the b
   * There is a minimum of 2 players and a maximum of 8 players.
 4. Once you have all your players the leader can do `!start` or react with the ballet box with check emoji.
   * It will pick a random person to begin.
-5. When its your turn you can react with the 🎲 or the 🏠. The die will roll 2 dice and move you to the new position. The house will attempt to buy a house (see rules for buying a house).
+5. When its your turn you can react with the 🎲 or the 🏠 (you can do `!roll` or `!house` if you prefer). The die will roll 2 dice and move you to the new position. The house will attempt to buy a house (see <a href="#buying-houses">this</a> for buying a house).
   * If you land on unowned property you can react with the ✅ to buy it or react with the 🛑 to auction it (see <a href="#auctions">auctions</a> for more detail).
   * If you land on a Chance card or a Community Chest card your character will do whatever the card says (get money, lose money, move to new position etc.)
   * If you land on go to jail or get a card that moves you to jail you will be moved to jail and your turn will be over (if you rolled doubles you get to roll again). See <a href="#jail">jail</a> for more info.
@@ -88,6 +88,10 @@ When property is put up for auction, the player who landed on it begins the auct
 ## Jail
 
 A player can go to jail in 3 ways. Either by getting a card that sends them to jail, landing on the go to jail tile or by rolling doubles 3 times in a row. While in jail the player can still collect rent and can bid on property and accept offers. There are 3 ways a player can get out of jail. Either by having a get out of jail free card (will be used the first turn if you don't roll doubles), by rolling doubles or if you don't roll doubles after 3 turns you will pay $50 dollars and get out of jail.
+
+## Buying Houses
+
+In order to buy a house you have to own all properties in a color group. Once that is done houses must be built evenly across all color groups that you own. Reacting with the 🏠 or doing `!house` will find the cheapest eligable property and build a house. 
 
 ## Selling Property
 

@@ -184,7 +184,7 @@ class Game {
             /* 4 */
             new Property("Nitro Monthly Subscription - Pay $200", 200, "Tax"),
             /* 5 */
-            new Property("Wumpus’ Wonderful Rail", [0, 25, 50, 100, 200], "RR", 200, 100, 0, "https://cdn.discordapp.com/attachments/593554477844529152/593587929331531797/Wumpus_Wonderful_Rail.png"),
+            new Property("Wumpus’ Wonderful Rail", [0, 25, 50, 100, 200], "RR", 200, 100, 0, "https://cdn.discordapp.com/attachments/593554477844529152/593594152441348112/Wumpus_Wonderful_Rail.png"),
             /* 6 */
             new Property("Russian Metro (Light Blue)", [6, 30, 90, 270, 400, 550], "BLUE", 100, 50, 50),
             /* 7 */
@@ -204,7 +204,7 @@ class Game {
             /* 14 */
             new Property("Vanilla Unicorn (Pink)", [12, 60, 180, 500, 700, 900], "LUMINOUS_VIVID_PINK", 160, 80, 100),
             /* 15 */
-            new Property("Hypesquad Bravery", [0, 25, 50, 100, 200], "RR", 200, 100, 0, "https://cdn.discordapp.com/attachments/593554477844529152/593587642575224891/HypesquadBravery.png"),
+            new Property("Hypesquad Bravery", [0, 25, 50, 100, 200], "RR", 200, 100, 0, "https://cdn.discordapp.com/attachments/593554477844529152/593592893718003726/HypesquadBravery.png"),
             /* 16 */
             new Property("Rockport (Orange)", [14, 70, 200, 550, 750, 950], "ORANGE", 180, 90, 100),
             /* 17 */
@@ -224,7 +224,7 @@ class Game {
             /* 24 */
             new Property("Hell (Red)", [20, 100, 300, 750, 925, 1100], "DARK_RED", 240, 120, 150),
             /* 25 */
-            new Property("Hypesquad Brilliance", [0, 25, 50, 100, 200], "RR", 200, 100, 0, "https://cdn.discordapp.com/attachments/593554477844529152/593588213957001219/HypesquadBrilliance.png"),
+            new Property("Hypesquad Brilliance", [0, 25, 50, 100, 200], "RR", 200, 100, 0, "https://cdn.discordapp.com/attachments/593554477844529152/593591813781061699/HypesquadBrilliance.png"),
             /* 26 */
             new Property("Dustbowl (Yellow)", [22, 110, 330, 800, 975, 1150], "GOLD", 260, 130, 150),
             /* 27 */
@@ -244,7 +244,7 @@ class Game {
             /* 34 */
             new Property("Sokrovenno (Green)", [28, 150, 450, 1000, 1200, 1400], "DARK_GREEN", 320, 160, 200),
             /* 35 */
-            new Property("Hypesquad Balance", [0, 25, 50, 100, 200], "RR", 200, 100, 0, "https://cdn.discordapp.com/attachments/593554477844529152/593588493578534939/HypesquadBalance.png"),
+            new Property("Hypesquad Balance", [0, 25, 50, 100, 200], "RR", 200, 100, 0, "https://cdn.discordapp.com/attachments/593554477844529152/593592388803493888/HypesquadBalance.png"),
             /* 36 */
             new Property("Chance", 0, "Chance"),
             /* 37 */

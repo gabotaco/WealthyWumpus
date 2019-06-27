@@ -43,7 +43,19 @@ const CommunityChestCards = [ //Community Chest cards
     new Card("Go to jail. Do not pass Go, do not collect $200", 0, false, 10, false),
     new Card("Get out of jail free", 0, true, null, false),
     new Card("Advance to Summoner’s Rift. If you pass Go, collect $200", 0, false, 11, false),
-    new Card("You sold your PS4. Receive $200", 200, false, null, false)
+    new Card("You sold your PS4. Receive $200", 200, false, null, false),
+    new Card("You install your graphics card without grounding yourself, pay $200", -200, false, null, false),
+    new Card("You beat the elite four on your first try collect $50", 50, false, null, false),
+    new Card("You spilled coffee on your keyboard lose $100", -100, false, null, false),
+    new Card("Your switch gets stolen lose $300", -300, false, null, false),
+    new Card("You found your mothers credit card and bought some sick skins from loot crates, win $50", 50, false, null, false),
+    new Card("You win a free headset out of a giveaway, win $100", 100, false, null, false),
+    new Card("You realize you are addicted to collecting amiibo, lose $100", -100, false, null, false),
+    new Card("Save money on GFUEL, collect $50", 50, false, null, false),
+    new Card("Reach elite smash, win $50", 50, false, null, false),
+    new Card("Get caught using discord during class, you lose $400", -400, false, null, false),
+    new Card("Successfully reboot a game, win $50", 50, false, null, false),
+    new Card("Pay for a year of spotify premium, lose $50", -50, false, null, false )
 ]
 
 class Property { //Make a property

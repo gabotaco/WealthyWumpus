@@ -8,10 +8,10 @@ const fs = require("fs")
 bot.games = new Discord.Collection(); //stores all games
 
 class Card {
-    constructor(Text, Money, Jail, MoveTo, CollectFromPlayers) {
+    constructor(Text, Money, GetOutOfJail, MoveTo, CollectFromPlayers) {
         this.Text = Text; //what it says on the card
         this.Money = Money; //change in money
-        this.GetOutOfJail = Jail; //if its get out of jail
+        this.GetOutOfJail = GetOutOfJail; //if its get out of jail
         this.MoveTo = MoveTo //what space to move to
         this.CollectFromPlayers = CollectFromPlayers || false //if you collect from players (default is false)
     }
@@ -72,7 +72,7 @@ class Property { //Make a property
         const PropertyEmbed = new Discord.RichEmbed() //Sets the color, name of embed to property name, price, if its mortgaged, and price per building
             .setColor(this.Color)
             .setTitle(this.Name)
-            .addField("Price", this.Price, true)
+            .addField("Price", "$" + this.Price, true)
         if (this.Color == "Utility" || this.Color == "RR") {
             PropertyEmbed.setColor("RANDOM")
         }
@@ -1172,7 +1172,7 @@ bot.on("message", async (message) => {
                     bot.games.get(message.channel.id).Buy(message)
                 }
                 break;
-            case "end": //end the game
+            case "end": //end your turn
                 if (!bot.games.has(message.channel.id)) { //if there is no game
                     await message.channel.send(`there is no game in this channel. Do ${prefix}create to make a game`)
                 } else { //if game

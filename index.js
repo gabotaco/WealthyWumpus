@@ -1123,7 +1123,7 @@ bot.on("message", async (message) => {
                     .addField(`${prefix}stats`, "Get information about yourself", true)
                     .addField(`${prefix}buy`, "Buy the property you are currently on", true)
                     .addField(`${prefix}end`, "Ends your turn", true)
-                    .addField(`${prefix}bid [amount|stop]`, "Bid for the auction", true)
+                    .addField(`${prefix}bid [amount|quit]`, "Bid for the auction", true)
                     .addField(`${prefix}house`, "Buy houses", true)
                     .addField(`${prefix}sell [property] {reciever} {cost}`, "Sell property and houses (if theres a house no need to provide a reciever)", true)
                     .addField(`${prefix}offer [confirm|deny]`, "Accept or deny an offer from another player", true)

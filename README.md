@@ -16,7 +16,7 @@
 </p>
 
 
-<div align="center"> <img src="https://i.imgur.com/3slzIe4.png"> </div>
+<div align="center"> <img src="https://i.imgur.com/3slzIe4.png" width="100%"> </div>
 
 ## Table of content
 

@@ -21,14 +21,29 @@ const CommunityChestCards = [ //Community chest cards
     new Card("Get out of jail free", 0, true, null, false),
     new Card("Advance to Go", 0, false, 0, false),
     new Card("Go to jail. Do not pass Go, do not collect $200", 0, false, 10, false),
-    new Card("You got a lucky loot crate! Collect $50 from every other player", 50, false, null, true)
+    new Card("You got a lucky loot crate! Collect $50 from every other player", 50, false, null, true),
+    new Card("Advance to Hell. If you pass go, collect $200", 0, false, 24, false),
+    new Card("Advance to Hypesquad Balance", 0, false, 35, false),
+    new Card("Advance to Hypesquad Bravery", 0, false, 15, false),
+    new Card("Advance to Hypsquad Brilliance", 0, false, 25, false),
+    new Card("Advance to Wumpus’ Wonderful Rail", 0, false, 5, false),
+    new Card("Advance to Final Destination", 0, false, 39, false),
+    new Card("Your game saves all got corrupted. Pay $30 to each player", -30, false, null, true),
+    new Card("You bought Nitro on a second account, just to get another server boost. Pay $15", -15, false, null, false),
+    new Card("You decided to gift a year’s worth of Nitro to all of your closest friends. Pay each player $50", -50, false, null, true),
+    new Card("You got the new Call of Duty, but decided to return it. Receive $50", 15, false, null, false),
+    new Card("Advance to Go, and collect $200", 0, false, 0, false),
+    new Card("Your mom sent a check in the mail. Receive $150", 150, false, null, false),
+    new Card("You won the lottery! Kinda. Receive $100", 100, false, null, false),
+    new Card("Advance to the Server Room", 0, false, 12, false)
 ]
 
 const ChanceCards = [ //chance cards
     new Card("You got a victory royale as John Wick! Collect $150", 150, false, null, false),
     new Card("Go to jail. Do not pass Go, do not collect $200", 0, false, 10, false),
     new Card("Get out of jail free", 0, true, null, false),
-    new Card("Advance to Summoner’s Rift. If you pass Go, collect $200", 0, false, 11, false)
+    new Card("Advance to Summoner’s Rift. If you pass Go, collect $200", 0, false, 11, false),
+    new Card("You sold your PS4. Receive $200", 200, false, null, false)
 ]
 
 class Property { //Make a property

@@ -6,7 +6,7 @@
 </h1>
 
 <h4 align="center">
-    A Discord bot to play Monopoly in Discord. Made for Discord Hack Week
+    A Discord bot to play Monopoly in Discord. Made for Discord Hack Week.
 </h4>
 
 <p align="center">
@@ -31,11 +31,11 @@
     - Use message reactions instead of typing commands
 * Light Weight
 * Incorporates 99% of rules from the original game
-* Quick and fun to play
+* Completely playable without any commands
 
 # Commands
 
-Some commands have reactions to make it easier to play but here's the list of all commands:
+The most often used commands have message reactions but heres a list of all supported commands that could come in handy.
 
 | Command | Description  | Has Reaction |
 |---------|--------------|------------- |
@@ -73,12 +73,12 @@ The only change made for this bot is that when the player goes bankrupt to the b
   * There is a minimum of 2 players and a maximum of 8 players.
 4. Once you have all your players the leader can do `!start` or react with the ballet box with check emoji.
   * It will pick a random person to begin.
-5. When its your turn you can react with the 🎲 or the 🏠 (you can do `!roll` or `!house` if you prefer). The die will roll 2 dice and move you to the new position. The house will attempt to buy a house (see <a href="#buying-houses">this</a> for buying a house).
-  * If you land on unowned property you can react with the ✅ to buy it or react with the 🛑 to auction it (see <a href="#auctions">auctions</a> for more detail).
+5. When its your turn you can react with the 🎲 or the 🏠 (you can do `!roll` or `!house` if you prefer). It will roll 2 dice and move you to the new position. The house will attempt to buy a house (see <a href="#buying-houses">this</a> for buying a house).
+  * If you land on unowned property you can react with the ✅ emoji to buy it or react with the 🛑 emoji to auction it (see <a href="#auctions">auctions</a> for more detail).
   * If you land on a Chance card or a Community Chest card your character will do whatever the card says (get money, lose money, move to new position etc.)
   * If you land on go to jail or get a card that moves you to jail you will be moved to jail and your turn will be over (if you rolled doubles you get to roll again). See <a href="#jail">jail</a> for more info.
-6. Before or after rolling, the player can offer property to another player for a specified amount of money, sell houses or mortgage/unmortgage property. These all must be done through commands. To understand selling houses and property read <a href="#selling-property">this</a>. To Mortgage and unmortgage property simply do either `!mortgage [property]` or `!unmortgage [property]`. 
-7. After you are finished with your command you can react with 🛑 to move on to the next player.
+6. Before or after rolling, the player can sell houses, mortgage/unmortgage property, and/or offer property to another player for a specified amount of money. These all must be done through commands. To understand selling houses and property read <a href="#selling-property">this</a>. To mortgage and unmortgage property simply do either `!mortgage [property name]` or `!unmortgage [property name]`. 
+7. After you are finished with your command you can react with 🛑 emoji to move on to the next player.
 8. Repeat until someone goes bankrupt.
 
 ## Auctions

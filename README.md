@@ -109,7 +109,7 @@ To clone and run this bot, you'll need [Git](https://git-scm.com) and [Node.js](
 
 ```bash
 # Clone this repository
-$ git clone https://github.com/Gabolicious/MonopolyBot.git
+$ git clone https://github.com/Gabolicious/WealthyWumpus.git
 
 # Install dependencies
 $ npm install discord.js

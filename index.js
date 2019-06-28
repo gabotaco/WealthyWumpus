@@ -82,11 +82,12 @@ class Property { //Make a property
 
     Info() { //gets info about the property
         const PropertyEmbed = new Discord.RichEmbed() //Sets the color, name of embed to property name, price, if its mortgaged, and price per building
-            .setColor(this.Color)
             .setTitle(this.Name)
             .addField("Price", "$" + this.Price, true)
-        if (this.Color == "Utility" || this.Color == "RR") {
+        if (this.Color == "Utility" || this.Color == "RR") { //not valid embed color
             PropertyEmbed.setColor("RANDOM")
+        } else { //valid color
+            PropertyEmbed.setColor(this.Color)
         }
 
         if (this.Image) PropertyEmbed.setImage(this.Image)
@@ -527,7 +528,7 @@ class Game {
                         this.CurrentPlayer.Free(); //free
                         await this.CurrentPlayer.Move(message, Dice1 + Dice2, this.Properties) //move
                     } else { //been in jail for less than 3 turns
-                        await message.channel.send(`you rolled a ${Dice1} and a ${Dice2} but you are in jail and cannot move!`).then(async msg => await msg.react("🛑")) //can't move
+                        await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} but you are in jail and cannot move!`).then(async msg => await msg.react("🛑")) //can't move
                     }
 
                 }

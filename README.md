@@ -48,7 +48,7 @@ The most often used commands have message reactions but heres a list of all supp
 |!start  | **Start the game**|✅|
 |!leader [new leader]  | **Change the game leader**|❌|
 |!roll  | **Roll the dice**|✅|
-|!stats  | **Get a info about yourself**|❌|
+|!stats  | **Get info about yourself**|❌|
 |!buy  | **Buy the property you are currently on**|✅|
 |!end  | **End your turn**|✅|
 |!bid [amount\|quit]  | **Bid on property or back out**|✅|
@@ -78,7 +78,7 @@ The only change made for this bot is that when the player goes bankrupt to the b
   * If you land on a Chance card or a Community Chest card your character will do whatever the card says (get money, lose money, move to new position etc.)
   * If you land on go to jail or get a card that moves you to jail you will be moved to jail and your turn will be over (if you rolled doubles you get to roll again). See <a href="#jail">jail</a> for more info.
 6. Before or after rolling, the player can sell houses, mortgage/unmortgage property, and/or offer property to another player for a specified amount of money. These all must be done through commands. To understand selling houses and property read <a href="#selling-property">this</a>. To mortgage and unmortgage property simply do either `!mortgage [property name]` or `!unmortgage [property name]`. 
-7. After you are finished with your command you can react with 🛑 emoji to move on to the next player.
+7. After you are finished with your turn you can react with 🛑 emoji to move on to the next player.
 8. Repeat until someone goes bankrupt.
 
 ## Auctions
@@ -87,11 +87,11 @@ When property is put up for auction, the player who landed on it begins the auct
 
 ## Jail
 
-A player can go to jail in 3 ways. Either by getting a card that sends them to jail, landing on the go to jail tile or by rolling doubles 3 times in a row. While in jail the player can still collect rent and can bid on property and accept offers. There are 3 ways a player can get out of jail. Either by having a get out of jail free card (will be used the first turn if you don't roll doubles), by rolling doubles or if you don't roll doubles after 3 turns you will pay $50 dollars and get out of jail.
+A player can go to jail in 3 ways. Either by getting a card that sends them to jail, landing on the go to jail tile or by rolling doubles 3 times in a row. While in jail the player can still collect rent and can bid on property and accept offers. There are 3 ways a player can get out of jail. Either by having a get out of jail free card (will be used the first turn if you don't roll doubles), by rolling doubles or if you don't roll doubles after 3 turns you will pay $50 and get out of jail.
 
 ## Buying Houses
 
-In order to buy a house, you have to own all properties in a color group. Once that is done houses must be built evenly across all color groups that you own. Reacting with the 🏠 or doing `!house` will find the cheapest eligible property and build a house. 
+In order to buy a house, you have to own all properties in a color group. Once that is done houses must be built evenly across all color groups that you own. Reacting with the 🏠 emoji or doing `!house` will find the cheapest eligible property and build a house. 
 
 ## Selling Property
 
@@ -124,7 +124,7 @@ Inside the repository create botconfig.json and it should look something like th
     "prefixes": {}
 }
 ```
-Note: prefixes will be filled in for you when it joins a new guild.
+Note: prefixes will be filled in for you the first time you do a command.
 
 # Credits
 Close friends who made this possible.

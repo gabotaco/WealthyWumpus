@@ -9,10 +9,9 @@
     A Discord bot to play Monopoly in Discord. Made for Discord Hack Week.
 </h4>
 <p align="center">
-  <a href="https://hypesquad.fandom.com/wiki/Brilliance"><img src="https://img.shields.io/badge/Hypesquad-Brilliance-orange.svg?style=for-the-badge" alt="Brilliance">
-  </a>
-  <a href=""><img src="https://img.shields.io/badge/TIPS%20TOP%20HAT-M'nopoly-critical.svg?style=for-the-badge"></a>
-  <a href=""><img src="https://img.shields.io/badge/AGES-8%2B-blueviolet.svg?style=for-the-badge" alt="8+"></a>
+  <img src="https://img.shields.io/badge/Hypesquad-Brilliance-orange.svg?style=for-the-badge" alt="Brilliance">
+  <img src="https://img.shields.io/badge/TIPS%20TOP%20HAT-M'nopoly-critical.svg?style=for-the-badge">
+  <img src="https://img.shields.io/badge/AGES-8%2B-blueviolet.svg?style=for-the-badge" alt="8+">
 </p>
 <p align="center">
   <a href="#key-features">Key Features</a> •

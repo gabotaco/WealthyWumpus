@@ -26,6 +26,8 @@
 
 # Key Features
 
+* Discord and video game themed properties, community chest, and chance cards.
+* Custom Monopoly cards
 * Easily Customizable
   - Add and change properties
   - Add and change Community Chest and Chance cards

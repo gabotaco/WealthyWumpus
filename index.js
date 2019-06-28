@@ -106,7 +106,7 @@ const Props = [ //The board
     /* 3 */
     new Property("Desert Temple (Brown)", [4, 20, 60, 180, 320, 450], "DARK_ORANGE", 60, 30, 50, "https://cdn.discordapp.com/attachments/593554477844529152/593595602084823058/DesertTemple.png"),
     /* 4 */
-    new Property("Nitro Monthly Subscription - Pay $200", 200, "Tax"),
+    new Property("a Nitro Monthly Subscription", 200, "Tax"),
     /* 5 */
     new Property("Wumpus’ Wonderful Rail", [0, 25, 50, 100, 200], "RR", 200, 100, 0, "https://cdn.discordapp.com/attachments/593554477844529152/593594152441348112/Wumpus_Wonderful_Rail.png"),
     /* 6 */
@@ -174,7 +174,7 @@ const Props = [ //The board
     /* 37 */
     new Property("The End (Dark Blue)", [35, 175, 500, 1100, 1300, 1500], "DARK_BLUE", 350, 175, 200, "https://cdn.discordapp.com/attachments/593554477844529152/593609561231851521/TheEnd.png"),
     /* 38 */
-    new Property("Nitro Boost - Pay $100", 100, "Tax"),
+    new Property("Nitro Boost", 100, "Tax"),
     /* 39 */
     new Property("Final Destination (Dark Blue)", [50, 200, 600, 1400, 1700, 2000], "DARK_BLUE", 400, 200, 200, "https://cdn.discordapp.com/attachments/593554477844529152/593610136950407178/FinalDestination.png")
 ]
@@ -415,7 +415,7 @@ class Game {
                         await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on your own ${CurrentProperty.Name}...`).then(async msg => await msg.react("🛑"))
                     }
                 } else { //if its not owned
-                    await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name}. It costs $${CurrentProperty.Price}. React with the check mark or do ${botconfig.prefixes[message.guild.id].prefix}buy to buy it or react with the stop sign or do ${botconfig.prefixes[message.guild.id].prefix}end to auction it! You currently have $${this.CurrentPlayer.Money}`, CurrentProperty.Info()).then(async msg => {
+                    await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name}. It costs $${CurrentProperty.Price}. React with the check mark or do ${botconfig.prefixes[message.guild.id].prefix}buy to buy it or react with the stop sign or do ${botconfig.prefixes[message.guild.id].prefix}end to auction it! You currently have $${this.CurrentPlayer.Money} and ${this.CurrentPlayer[CurrentProperty.Color]} properties with this color.`, CurrentProperty.Info()).then(async msg => {
                         await msg.react("✅");
                         await msg.react("🛑");
                     })
@@ -439,7 +439,7 @@ class Game {
                         }
                     }
                 } else { //not owned
-                    await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name}. It costs $${CurrentProperty.Price}. React with the check mark or do ${botconfig.prefixes[message.guild.id].prefix}buy to buy it or react with the stop sign or do ${botconfig.prefixes[message.guild.id].prefix}end to auction it! You currently have $${this.CurrentPlayer.Money}`, CurrentProperty.Info()).then(async msg => {
+                    await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name}. It costs $${CurrentProperty.Price}. React with the check mark or do ${botconfig.prefixes[message.guild.id].prefix}buy to buy it or react with the stop sign or do ${botconfig.prefixes[message.guild.id].prefix}end to auction it! You currently have $${this.CurrentPlayer.Money} and ${this.CurrentPlayer[CurrentProperty.Color]} properties with this color.`, CurrentProperty.Info()).then(async msg => {
                         await msg.react("✅");
                         await msg.react("🛑");
                     })
@@ -481,7 +481,7 @@ class Game {
                         }
                     }
                 } else { //nobody owns it
-                    await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name}. React with the check mark or do ${botconfig.prefixes[message.guild.id].prefix}buy to buy the property or react with the stop sign or do ${botconfig.prefixes[message.guild.id].prefix}end to auction it! You currently have $${this.CurrentPlayer.Money}`, CurrentProperty.Info()).then(async msg => {
+                    await message.channel.send(`<@${userID}>, you rolled a ${Dice1} and a ${Dice2} and landed on ${CurrentProperty.Name}. React with the check mark or do ${botconfig.prefixes[message.guild.id].prefix}buy to buy the property or react with the stop sign or do ${botconfig.prefixes[message.guild.id].prefix}end to auction it! You currently have $${this.CurrentPlayer.Money} and ${this.CurrentPlayer[CurrentProperty.Color]} properties with this color.`, CurrentProperty.Info()).then(async msg => {
                         await msg.react("✅");
                         await msg.react("🛑");
                     })
@@ -665,7 +665,7 @@ class Game {
                 await msg.react("⬆");
                 await msg.react("⏫")
             }) //start bid
-        } else { //if bought or can't be bought
+        } else if (this.Players.size > 1) { //if bought or can't be bought
             this.CurrentPlayer.Rolled = false; //reset rolled
             if (this.CurrentPlayer.Doubles && this.CurrentPlayer.Money >= 0) { //if its doubles and they didn't go bankrupt
                 await message.channel.send(`<@${userID}>, roll again!`).then(async msg => {

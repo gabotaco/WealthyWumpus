@@ -8,7 +8,14 @@
 <h4 align="center">
     A Discord bot to play Monopoly in Discord. Made for Discord Hack Week.
 </h4>
-
+<p align="center">
+  <a href="https://hypesquad.fandom.com/wiki/Brilliance"><img src="https://img.shields.io/badge/Hypesquad-Brilliance-orange.svg?style=for-the-badge" alt="Brilliance">
+  </a>
+  <a href="https://github.com/Gabolicious/WealthyWumpus/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-informational.svg?style=for-the-badge" alt="MIT"></a>
+  <a href="https://www.javascript.com/"><img src="https://img.shields.io/badge/MADE%20WITH-JAVASCRIPT-yellow.svg?style=for-the-badge" alt="JAVASCRIPT"></a>
+  <a href=""><img src="https://img.shields.io/badge/AGES-8%2B-blueviolet.svg?style=for-the-badge" alt="8+"></a>
+  <a href=""><img src="https://img.shields.io/badge/READING%20LEVEL-6TH%20GRADE-lightgrey.svg?style=for-the-badge"></a>
+</p>
 <p align="center">
   <a href="#key-features">Key Features</a> •
   <a href="#commands">Commands</a> •

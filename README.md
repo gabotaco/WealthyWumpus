@@ -118,8 +118,7 @@ To clone and run this bot, you'll need [Git](https://git-scm.com) and [Node.js](
 $ git clone https://github.com/Gabolicious/WealthyWumpus.git
 
 # Install dependencies
-$ npm install discord.js
-$ npm install fs
+$ npm install
 ```
 
 Inside the repository create botconfig.json and it should look something like this:

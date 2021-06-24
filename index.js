@@ -1,7 +1,7 @@
 const Discord = require("discord.js");
 const botconfig = require("./botconfig.json");
 const bot = new Discord.Client({
-    disableEveryone: true
+    disableMentions: "true"
 });
 const fs = require("fs")
 
@@ -81,7 +81,7 @@ class Property { //Make a property
     }
 
     Info() { //gets info about the property
-        const PropertyEmbed = new Discord.RichEmbed() //Sets the color, name of embed to property name, price, if its mortgaged, and price per building
+        const PropertyEmbed = new Discord.MessageEmbed() //Sets the color, name of embed to property name, price, if its mortgaged, and price per building
             .setTitle(this.Name)
             .addField("Price", "$" + this.Price, true)
         if (this.Color == "Utility" || this.Color == "RR") { //not valid embed color
@@ -556,7 +556,7 @@ class Game {
     async Stats(message) { //get stats for player
         if (!this.Players.has(message.author.id)) return message.reply(`you aren't in this game`)
         const player = this.Players.get(message.author.id)
-        const PlayerEmbed = new Discord.RichEmbed()
+        const PlayerEmbed = new Discord.MessageEmbed()
             .setTitle(`Stats for ${message.member.displayName}`)
             .setColor("DEFAULT")
             .addField("Position", this.Properties[player.Position].Name, true)
@@ -1078,7 +1078,7 @@ class Game {
         if (!this.Players.has(message.author.id)) return await message.reply("you aren't in this game")
 
         const Player = this.Players.get(message.author.id)
-        const PropertyEmbed = new Discord.RichEmbed()
+        const PropertyEmbed = new Discord.MessageEmbed()
             .setTitle("Property you own")
             .setColor("RANDOM")
         for (let i = 0; i < this.Properties.length; i++) {
@@ -1121,7 +1121,7 @@ bot.on("message", async (message) => {
 
         switch (cmd) { //get command
             case "help": //help
-                const HelpEmbed = new Discord.RichEmbed()
+                const HelpEmbed = new Discord.MessageEmbed()
                     .setTitle("Help")
                     .setColor("RANDOM")
                     .addField(`${prefix}prefix [new prefix]`, "Change the server prefix to whatever", true)
